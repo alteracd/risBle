@@ -5,9 +5,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import android.Manifest;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -24,6 +22,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
@@ -64,14 +63,24 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.Executor;
+
+
+import lecho.lib.hellocharts.gesture.ContainerScrollType;
+import lecho.lib.hellocharts.gesture.ZoomType;
+import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.AxisValue;
+import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.PointValue;
+import lecho.lib.hellocharts.model.ValueShape;
+import lecho.lib.hellocharts.model.Viewport;
+import lecho.lib.hellocharts.view.LineChartView;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -81,28 +90,29 @@ public class MainActivity extends AppCompatActivity {
     private Button sendButton;
     private TextView sendView;
 
-
-    private BluetoothAdapter myBluetoothAdapter;
-    private BluetoothManager myBluetoothManager;
-    private BluetoothDevice selectedDevice;
-
+    private int dbm = -1;
     private WifiManager mywifiManager;
     private WifiInfo mywifiinfo;
-    private int dbm = -1;
-
 
     private String message = "";
     private String  mobileNetworkSignal= "";
+    private String  type= "";
     private boolean flag = false;
     private boolean BLE_flag = false;
     private boolean BLE = false;
     private boolean mode = true;
 
-    //service uuid
+    private LineChartView lineChart;
+//    private String[] timeline= new String[30] ;//X轴的标注
+    private int[] signal= new int[30];//图表的数据点
+    private String[] timeline = {"30s前","29","28","27s前","26","25","24","23","22s前","21","20","19","18","19","18","15","14s前","13","12","11","10s前","9","8","7","6s前","5s前","4","3","2","1"};//X轴的标注
+//    private int[] signal= {74,22,18,79,20,74,20,74,42,90,74,42,90,50,42,90,33,10,74,22,18,79,20,74,22,18,79,20};//图表的数据
+    private List<PointValue> mPointValues = new ArrayList<PointValue>();
+    private List<AxisValue> mAxisXValues = new ArrayList<AxisValue>();
+
+
     public static UUID UUID_SERVER;
-    //读的特征值¸
     public static UUID UUID_CHAR_READ;
-    //写的特征值
     public static UUID UUID_CHAR_WRITE;
     public static final String TAG = "BluetoothLeService";
     private BluetoothGatt myBluetoothGatt;
@@ -118,6 +128,9 @@ public class MainActivity extends AppCompatActivity {
     private myAdapter adapterlist;
     private ScanCallback leScanCallback;
 
+    private BluetoothAdapter myBluetoothAdapter;
+    private BluetoothManager myBluetoothManager;
+    private BluetoothDevice selectedDevice;
     private static final long SCAN_PERIOD = 10000;  // Stops scanning after 10 seconds.
 
     public void getBlePermissionFromSys() {
@@ -178,7 +191,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void clearline(){
+        for(int i=0;i<30;i++) {
+            signal[i] = -127;
+        }
+        mPointValues.clear();
+
+    }
+
     public void modechange() {
+        clearline();
         if (mode) {
             mode = false;
             modeButton.setText("类型：WiFi");
@@ -187,149 +209,6 @@ public class MainActivity extends AppCompatActivity {
             modeButton.setText("类型：移动网络");
         }
     }
-
-
-//判断是否包含SIM卡
-//    public static boolean hasSimCard(Context context) {
-//        TelephonyManager telMgr = (TelephonyManager)
-//                context.getSystemService(Context.TELEPHONY_SERVICE);
-//        int simState = telMgr.getSimState();
-//        boolean result = true;
-//        switch (simState) {
-//            case TelephonyManager.SIM_STATE_ABSENT:
-//            case TelephonyManager.SIM_STATE_UNKNOWN:
-//                result = false; // 没有SIM卡
-//                break;
-//        }
-//        return result;
-//    }
-
-//    private void getMobileNetworkSignal() {
-////        if (!MainActivity.hasSimCard(context)) {
-////            Log.e(TAG,"getMobileNetworkSignal: no sim card");
-////            return;
-////        }
-//        TelephonyManager mTelephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-//        if (mTelephonyManager != null) {
-//            mTelephonyManager.listen(new PhoneStateListener() {
-//
-//                @Override
-//                public void onSignalStrengthsChanged(SignalStrength signalStrength) {
-//                    super.onSignalStrengthsChanged(signalStrength);
-//                    int asu = signalStrength.getGsmSignalStrength();
-//                    int lastSignal = -113 + 2 * asu;
-//                    if (lastSignal > 0) {
-//                        mobileNetworkSignal = lastSignal + "dBm";
-//                    }
-//                    Log.e(TAG,"Current mobileNetworkSignal：" + lastSignal + " dBm");
-//                }
-//            }, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
-//        }
-//    }
-
-    /*
-    public interface GetMobileInfoCallback {
-        //** * 返回数据结果 * *
-        //* @param rssi 信号强度
-        void onGetMobileInfoResult(int rssi); }
-
-    public  class MyPhoneStateListener extends PhoneStateListener{
-
-        //private InfoCallback callback;
-        private Context context;
-        private TelephonyManager tm;
-
-        public void init(@NonNull Context context){
-            this.context = context;
-            this.callback = callback;
-            this.tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        }
-
-         //* 开始监听
-        public void register(){
-            if (tm == null){
-                callback.onGetMobileInfoResult(1);
-                return;
-            }
-            tm.listen(this,PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
-        }
-         //* 取消监听
-        public void unRegister(){
-            if (tm != null){
-                tm.listen(this,PhoneStateListener.LISTEN_NONE);
-            }
-        }
-
-        @Override
-        public void onSignalStrengthsChanged(SignalStrength signalStrength) {
-            super.onSignalStrengthsChanged(signalStrength);
-            // 检查权限
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    callback.onGetMobileInfoResult(2);
-                    return;
-                }
-            }
-            List<CellInfo> cellInfoList = tm.getAllCellInfo();
-            List<Integer> dbms = new ArrayList<>();
-            if (null != cellInfoList) {
-                for (CellInfo cellInfo : cellInfoList) {
-                    try {
-                        int dbm = 1;
-                        if (cellInfo instanceof CellInfoGsm) {
-                            CellSignalStrengthGsm cellSignalStrengthGsm = ((CellInfoGsm) cellInfo).getCellSignalStrength();
-                            dbm = cellSignalStrengthGsm.getDbm();
-                        } else if (cellInfo instanceof CellInfoCdma) {
-                            CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma) cellInfo).getCellSignalStrength();
-                            dbm = cellSignalStrengthCdma.getDbm();
-                        } else if (cellInfo instanceof CellInfoWcdma) {
-                            CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma) cellInfo).getCellSignalStrength();
-                            dbm = cellSignalStrengthWcdma.getDbm();
-                        } else if (cellInfo instanceof CellInfoLte) {
-                            CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte) cellInfo).getCellSignalStrength();
-                            dbm = cellSignalStrengthLte.getDbm();
-                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && cellInfo instanceof CellInfoNr) { // 5G
-                            CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr) cellInfo).getCellSignalStrength();
-                            dbm = cellSignalStrengthNr.getDbm();
-                        }
-                        dbms.add(dbm);
-                    } catch (Exception ignore) {
-                    }
-                }
-            }
-            Collections.sort(dbms);
-            if (dbms.size() > 1) {
-                callback.onGetMobileInfoResult(dbms.get(dbms.size() - 1));
-                dbm = dbms.get(dbms.size() - 1);
-            } else {
-                callback.onGetMobileInfoResult(1);
-                dbm=0;
-            }
-        }
-    }
-
-    /*
-    public  void getMobileSignalStrength(@NonNull final Context context) {
-        final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (tm == null) {
-            //callback.onGetMobileInfoResult(1);
-            return ;
-        }
-
-        final MyPhoneStateListener myPhoneStateListener = new MyPhoneStateListener();
-        myPhoneStateListener.init(context, new GetMobileInfoCallback() {
-            @Override
-            public void onGetMobileInfoResult(int rssi) {
-                myPhoneStateListener.unRegister();
-                //callback.onGetMobileInfoResult(rssi);
-            }
-        });
-        myPhoneStateListener.register();
-    }
-
-     */
-
 
     public void getDbm() {
 
@@ -352,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         CellSignalStrengthGsm cellSignalStrengthGsm = ((CellInfoGsm)cellInfo).getCellSignalStrength();
                         ss = cellSignalStrengthGsm.getDbm();
+                        type="Gsm";
                         //Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
                         Log.e("66666", "gsm dbm\t " + ss );
                     }
@@ -359,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma)cellInfo).getCellSignalStrength();
                         ss = cellSignalStrengthCdma.getDbm();
+                        type="Cdma";
                         //Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
                         Log.e("66666", "cdma dbm\t " + ss );
                     }
@@ -368,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
                         {
                             CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma)cellInfo).getCellSignalStrength();
                             ss = cellSignalStrengthWcdma.getDbm();
+                            type="Wcdma";
                             //Log.e("66666", "cellSignalStrengthWcdma" + cellSignalStrengthWcdma.toString() );
                             Log.e("66666", "wcdma dbm\t " + ss );
                         }
@@ -375,8 +257,8 @@ public class MainActivity extends AppCompatActivity {
                     else if (cellInfo instanceof CellInfoLte)
                     {
                         CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte)cellInfo).getCellSignalStrength();
-                        ss=cellSignalStrengthLte.getDbm();
-
+                        ss=cellSignalStrengthLte.getRssi();
+                        type="Lte";
 //                        Log.e("66666", "cellSignalStrengthLte.getAsuLevel()\t" + cellSignalStrengthLte.getAsuLevel() );
 //                        Log.e("66666", "cellSignalStrengthLte.getCqi()\t" + cellSignalStrengthLte.getCqi() );
 //                        Log.e("66666", "cellSignalStrengthLte.getDbm()\t " + cellSignalStrengthLte.getDbm() );
@@ -385,13 +267,13 @@ public class MainActivity extends AppCompatActivity {
 //                        Log.e("66666", "cellSignalStrengthLte.getRssi()\t " + cellSignalStrengthLte.getRssi() );
 //                        Log.e("66666", "cellSignalStrengthLte.getRssnr()\t " + cellSignalStrengthLte.getRssnr() );
 //                        Log.e("66666", "cellSignalStrengthLte.getTimingAdvance()\t " + cellSignalStrengthLte.getTimingAdvance() );
-//
-                        Log.e("66666", "LTE dbm\t " + ss );
+//                        Log.e("66666", "LTE dbm\t " + ss );
                     }
                     else if (cellInfo instanceof CellInfoNr)
                     {
                         CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr)cellInfo).getCellSignalStrength();
                         ss=cellSignalStrengthNr.getCsiRsrp();
+                        type="Nr";
 
 //                        Log.e("66666", "cellSignalStrengthNr.getAsuLevel()\t" + cellSignalStrengthNr.getAsuLevel() );
 //                        Log.e("66666", "cellSignalStrengthNr.getDbm()\t " + cellSignalStrengthNr.getDbm() );
@@ -400,18 +282,19 @@ public class MainActivity extends AppCompatActivity {
 //                        Log.e("66666", "cellSignalStrengthNr.getCsiRssi()\t " + cellSignalStrengthNr.getCsiRsrq());
 //                        Log.e("66666", "cellSignalStrengthNr.getSsRsrp()\t " + cellSignalStrengthNr.getSsRsrp() );
 //                        Log.e("66666", "cellSignalStrengthNr.getSsRsrq()\t " + cellSignalStrengthNr.getSsRsrq() );
-
-                        Log.e("66666", "NR dbm\t " + ss );
+//                        Log.e("66666", "NR dbm\t " + ss );
                     }
-                    dbms=dbms+ss;
-                    counter++;
+                    if(ss>-128 && ss<0) {
+                        dbms = dbms + ss;
+                        counter++;
+                    }
                 }
             }
-            Log.e("66666", "size\t " + counter );
+//            Log.e("66666", "size\t " + counter );
             if(counter!=0)
                 dbm = dbms/counter;
         }
-             Log.e("66666", "last dbm\t " + dbm );
+//             Log.e("66666", "last dbm\t " + dbm );
             }
         };
 
@@ -451,111 +334,6 @@ public class MainActivity extends AppCompatActivity {
 //        }, 1000, 1000);
 
     }
-
-    /*
-    public static class MyPhoneStateListener extends PhoneStateListener {
-
-        private InfoCallback callback;
-        private Context context;
-        private TelephonyManager tm;
-
-        public void init(@NonNull Context context, @NonNull GetMobileInfoCallback callback) {
-            this.context = context;
-            this.callback = (InfoCallback) callback;
-            this.tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        }
-
-        //* 开始监听
-        public void register() {
-            if (tm == null) {
-                callback.onGetMobileInfoResult(1);
-                return;
-            }
-            tm.listen(this, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
-        }
-
-        // 取消监听
-        public void unRegister() {
-            if (tm != null) {
-                tm.listen(this, PhoneStateListener.LISTEN_NONE);
-            }
-        }
-
-        @Override
-        public void onSignalStrengthsChanged(SignalStrength signalStrength) {
-            super.onSignalStrengthsChanged(signalStrength);
-
-            // 检查权限
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    callback.onGetMobileInfoResult(2);
-                    return;
-                }
-            }
-
-            List<CellInfo> cellInfoList = tm.getAllCellInfo();
-            List<Integer> dbms = new ArrayList<>();
-            if (null != cellInfoList) {
-                for (CellInfo cellInfo : cellInfoList) {
-                    try {
-                        int dbm = 1;
-                        if (cellInfo instanceof CellInfoGsm) {
-                            CellSignalStrengthGsm cellSignalStrengthGsm = ((CellInfoGsm) cellInfo).getCellSignalStrength();
-                            dbm = cellSignalStrengthGsm.getDbm();
-                        } else if (cellInfo instanceof CellInfoCdma) {
-                            CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma) cellInfo).getCellSignalStrength();
-                            dbm = cellSignalStrengthCdma.getDbm();
-                        } else if (cellInfo instanceof CellInfoWcdma) {
-                            CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma) cellInfo).getCellSignalStrength();
-                            dbm = cellSignalStrengthWcdma.getDbm();
-                        } else if (cellInfo instanceof CellInfoLte) {
-                            CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte) cellInfo).getCellSignalStrength();
-                            dbm = cellSignalStrengthLte.getDbm();
-                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && cellInfo instanceof CellInfoNr) { // 5G
-                            CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr) cellInfo).getCellSignalStrength();
-                            dbm = cellSignalStrengthNr.getDbm();
-                        }
-                        dbms.add(dbm);
-                    } catch (Exception ignore) {
-                    }
-                }
-            }
-            Collections.sort(dbms);
-            if (dbms.size() > 1) {
-                callback.onGetMobileInfoResult(dbms.get(dbms.size() - 1));
-            } else {
-                callback.onGetMobileInfoResult(1);
-            }
-        }
-
-
-
-    }
-
-    public static void getMobileSignalStrength(@NonNull final Context context,
-                                               @NonNull final InfoCallback callback) {
-        final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (tm == null) {
-            callback.onGetMobileInfoResult(1);
-            return ;
-        }
-
-        final MyPhoneStateListener myPhoneStateListener = new MyPhoneStateListener();
-        myPhoneStateListener.init(context, new GetMobileInfoCallback() {
-            @Override
-            public void onGetMobileInfoResult(int rssi) {
-                myPhoneStateListener.unRegister();
-                callback.onGetMobileInfoResult(rssi);
-            }
-        });
-        myPhoneStateListener.register();
-
-    }
-
-
- */
-
 
     public void getMobileDbm() {
 
@@ -663,7 +441,16 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (mode) {
                     message = String.valueOf(dbm);
-                    sendView.setText("data_CsiRsrp:" + message + "dBm" + "\n");
+                    if(type == "Nr")
+                        sendView.setText("Nr_CsiRsrp:" + message + "dBm" + "\n");
+                    else if(type == "Lte")
+                        sendView.setText("Lte_Rssi:" + message + "dBm" + "\n");
+                    else if (type == "Wcdma")
+                        sendView.setText("Wcdma_signal:" + message + "dBm" + "\n");
+                    else if (type == "Cdma")
+                        sendView.setText("Cdma_signal:" + message + "dBm" + "\n");
+                    else if (type == "Gsm")
+                        sendView.setText("Gsm_signal:" + message + "dBm" + "\n");
                 } else {
                     message = String.valueOf(mywifiinfo.getRssi());
                     sendView.setText("WiFi_RSSI:" + message + "dBm" + "\n");
@@ -673,7 +460,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 
     private void sendMessage() {
         if(!BLE){
@@ -697,7 +483,16 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             if (mode) {
                                 message = String.valueOf(dbm);
-                                sendView.setText("data_CsiRsrp:" + message + "dBm" + "\n");
+                                if(type == "Nr")
+                                    sendView.setText("Nr_CsiRsrp:" + message + "dBm" + "\n");
+                                else if(type == "Lte")
+                                    sendView.setText("Lte_Rssi:" + message + "dBm" + "\n");
+                                else if (type == "Wcdma")
+                                    sendView.setText("Wcdma:" + message + "dBm" + "\n");
+                                else if (type == "Cdma")
+                                    sendView.setText("Cdma:" + message + "dBm" + "\n");
+                                else if (type == "Gsm")
+                                    sendView.setText("Gsm:" + message + "dBm" + "\n");
                             }
                             else {
                                 message = String.valueOf(mywifiinfo.getRssi());
@@ -863,6 +658,7 @@ public class MainActivity extends AppCompatActivity {
                 mywifiinfo = mywifiManager.getConnectionInfo();
                 getDbm();
                 showtext();
+
                 //getMobileDbm();
                 //getMobileNetworkSignal();
             }
@@ -894,10 +690,109 @@ public class MainActivity extends AppCompatActivity {
         searchList.setAdapter(leDeviceListAdapter);
     }
 
+
+    //设置X 轴的显示
+    private void getAxisXLables() {
+        for (int i = 0; i < timeline.length; i++) {
+            mAxisXValues.add(new AxisValue(i).setLabel(timeline[i]));
+        }
+    }
+    //图表的每个点的显示
+    private void getAxisPoints() {
+        for (int i = 0; i < signal.length; i++) {
+            mPointValues.add(new PointValue(i, signal[i]));
+        }
+    }
+    private void initLineChart() {
+        Line line = new Line(mPointValues).setColor(Color.parseColor("#FFCD41"));  //折线的颜色（橙色）
+        List<Line> lines = new ArrayList<Line>();
+        line.setShape(ValueShape.CIRCLE);//折线图上每个数据点的形状  这里是圆形 （有三种 ：ValueShape.SQUARE  ValueShape.CIRCLE  ValueShape.DIAMOND）
+        line.setCubic(false);//曲线是否平滑，即是曲线还是折线
+        line.setFilled(false);//是否填充曲线的面积
+        line.setHasLabels(true);//曲线的数据坐标是否加上备注
+        line.setHasLabelsOnlyForSelected(true);//点击数据坐标提示数据（设置了这个line.setHasLabels(true);就无效）
+        line.setHasLines(true);//是否用线显示。如果为false 则没有曲线只有点显示
+        line.setHasPoints(false);//是否显示圆点 如果为false 则没有原点只有点显示（每个数据点都是个大的圆点）
+        lines.add(line);
+        LineChartData data = new LineChartData();
+        data.setLines(lines);
+        //坐标轴
+        Axis axisX = new Axis(); //X轴
+        axisX.setHasTiltedLabels(true);  //X坐标轴字体是斜的显示还是直的，true是斜的显示
+        axisX.setTextColor(Color.GRAY);  //设置字体颜色
+        //axisX.setName("date");  //表格名称
+        axisX.setTextSize(7);//设置字体大小
+        axisX.setMaxLabelChars(30); //最多几个X轴坐标，意思就是你的缩放让X轴上数据的个数7<=x<=mAxisXValues.length
+        axisX.setValues(mAxisXValues);  //填充X轴的坐标名称
+        data.setAxisXBottom(axisX); //x 轴在底部
+        //data.setAxisXTop(axisX);  //x 轴在顶部
+        axisX.setHasLines(true); //x 轴分割线
+        // Y轴是根据数据的大小自动设置Y轴上限(在下面我会给出固定Y轴数据个数的解决方案)
+        Axis axisY = new Axis();  //Y轴
+        axisY.setName("");//y轴标注
+        axisY.setTextSize(7);//设置字体大小
+        data.setAxisYLeft(axisY);  //Y轴设置在左边
+        //data.setAxisYRight(axisY);  //y轴设置在右边
+
+        //设置行为属性，支持缩放、滑动以及平移
+//        lineChart.setInteractive(true);
+//        lineChart.setZoomType(ZoomType.HORIZONTAL);
+//        lineChart.setMaxZoom((float) 2);//最大方法比例
+//        lineChart.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
+
+        lineChart.setLineChartData(data);
+        lineChart.setVisibility(View.VISIBLE);
+
+        Viewport v = new Viewport(lineChart.getMaximumViewport());
+        v.bottom = -120;
+        v.top = -10;
+        lineChart.setMaximumViewport(v);
+        v.left = 0;
+        v.right = 30;
+        lineChart.setCurrentViewport(v);
+
+    }
+
+    private void refresh(){
+
+        TimerTask myTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                mPointValues.clear();
+                for(int label=0;label<29;label++) {
+                    signal[label]=signal[label+1];
+                }
+                if (mode) {
+                    if(dbm>-125 && dbm<-10)
+                    signal[29]=dbm;
+                }
+                else{
+                    signal[29]=mywifiinfo.getRssi();
+                }
+                getAxisPoints();//获取坐标点
+//                getAxisXLables();//获取x轴的标注
+                initLineChart();
+
+            }
+        };
+        Timer myTimer = new Timer();
+        myTimer.schedule(myTimerTask, 10, 1000);
+
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        lineChart = (LineChartView)findViewById(R.id.line_chart);
+        clearline();
+        getAxisXLables();//获取x轴的标注
+        getAxisPoints();//获取坐标点
+        initLineChart();//初始化
+        refresh();
+
         getBlePermissionFromSys();
         //checkPermissions();
 

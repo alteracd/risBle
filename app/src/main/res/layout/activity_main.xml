@@ -10,20 +10,25 @@
         android:inputType="text"
         android:maxLength="100"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="50dp"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
         android:layout_marginBottom="3dp"
-        android:textSize="30sp"
+        android:textSize="20sp"
         android:textColor="@color/black"
         android:gravity="center"/>
 
+    <lecho.lib.hellocharts.view.LineChartView
+        android:id="@+id/line_chart"
+        android:layout_width="match_parent"
+        android:layout_height="250dp" />
 
     <Button
         android:id="@+id/mode_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Button" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
