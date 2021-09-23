@@ -86,25 +86,43 @@ public class MainActivity extends AppCompatActivity {
 
     private Button searchButton;
     private Button modeButton;
+    private Button infoButton1;
+    private Button infoButton2;
+    private Button infoButton4;
+    private Button infoButton3;
     private ListView searchList;
     private Button sendButton;
     private TextView sendView;
 
-    private int dbm = -1;
+    private int dbm1 = -1;
+    private int dbm2 = -1;
+    private int dbm3 = -1;
+    private int dbm4 = -1;
     private WifiManager mywifiManager;
     private WifiInfo mywifiinfo;
 
-    private String message = "";
-    private String  mobileNetworkSignal= "";
-    private String  type= "";
-    private boolean flag = false;
-    private boolean BLE_flag = false;
-    private boolean BLE = false;
-    private boolean mode = true;
+    private String message = "";//发送信息
+//    private String info1 = "";//显示信息1
+//    private String info2 = "";
+//    private String info3 = "";
+//    private String info4 = "";
+//    private String  mobileNetworkSignal= "";
+    private String  type= ""; //流量类型
+    private boolean flag = false; //发送
+    private boolean BLE_flag = false; //BLE信息
+    private boolean BLE = false; //BLE连接
+    private boolean mode = true; //网络类型 true 流量
+    private int charttype = 1;
 
     private LineChartView lineChart;
 //    private String[] timeline= new String[30] ;//X轴的标注
     private int[] signal= new int[30];//图表的数据点
+    private int[] signal1= new int[30];//图表的数据点
+    private int[] signal2= new int[30];//图表的数据点
+    private int[] signal3= new int[30];//图表的数据点
+    private int[] signal4= new int[30];//图表的数据点
+    private int[] signalwifi= new int[30];//图表的数据点
+
     private String[] timeline = {"30s前","29","28","27s前","26","25","24","23","22s前","21","20","19","18","19","18","15","14s前","13","12","11","10s前","9","8","7","6s前","5s前","4","3","2","1"};//X轴的标注
 //    private int[] signal= {74,22,18,79,20,74,20,74,42,90,74,42,90,50,42,90,33,10,74,22,18,79,20,74,22,18,79,20};//图表的数据
     private List<PointValue> mPointValues = new ArrayList<PointValue>();
@@ -193,10 +211,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void clearline(){
         for(int i=0;i<30;i++) {
-            signal[i] = -127;
+            signal[i] = -130;
         }
         mPointValues.clear();
-
     }
 
     public void modechange() {
@@ -220,9 +237,16 @@ public class MainActivity extends AppCompatActivity {
                 // DO SOMETHING
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
         {
-            int ss = 0;
+            int ss1 = 0;
+            int ss2 = 0;
+            int ss3 = 0;
+            int ss4 = 0;
             int counter = 0;
-            int dbms = 0;
+            int dbm1s = 0;
+            int dbm2s = 0;
+            int dbm3s = 0;
+            int dbm4s = 0;
+
             if (null != cellInfoList)
             {
                 for (CellInfo cellInfo : cellInfoList)
@@ -230,69 +254,67 @@ public class MainActivity extends AppCompatActivity {
                     if (cellInfo instanceof CellInfoGsm)
                     {
                         CellSignalStrengthGsm cellSignalStrengthGsm = ((CellInfoGsm)cellInfo).getCellSignalStrength();
-                        ss = cellSignalStrengthGsm.getDbm();
+                        ss1 = cellSignalStrengthGsm.getDbm();
                         type="Gsm";
                         //Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
-                        Log.e("66666", "gsm dbm\t " + ss );
+                        Log.e("66666", "gsm dbm\t " + ss1 );
                     }
                     else if (cellInfo instanceof CellInfoCdma)
                     {
                         CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma)cellInfo).getCellSignalStrength();
-                        ss = cellSignalStrengthCdma.getDbm();
+                        ss1 = cellSignalStrengthCdma.getDbm();
                         type="Cdma";
                         //Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
-                        Log.e("66666", "cdma dbm\t " + ss );
+                        Log.e("66666", "cdma dbm\t " + ss1 );
                     }
                     else if (cellInfo instanceof CellInfoWcdma)
                     {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
                         {
                             CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma)cellInfo).getCellSignalStrength();
-                            ss = cellSignalStrengthWcdma.getDbm();
+                            ss1 = cellSignalStrengthWcdma.getDbm();
                             type="Wcdma";
                             //Log.e("66666", "cellSignalStrengthWcdma" + cellSignalStrengthWcdma.toString() );
-                            Log.e("66666", "wcdma dbm\t " + ss );
+                            Log.e("66666", "wcdma dbm\t " + ss1 );
                         }
                     }
                     else if (cellInfo instanceof CellInfoLte)
                     {
                         CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte)cellInfo).getCellSignalStrength();
-                        ss=cellSignalStrengthLte.getRssi();
+                        ss1=cellSignalStrengthLte.getRssi();
+                        ss2=cellSignalStrengthLte.getRsrp();
+                        ss3=cellSignalStrengthLte.getRsrq();
+                        ss4=cellSignalStrengthLte.getRssnr();
                         type="Lte";
-//                        Log.e("66666", "cellSignalStrengthLte.getAsuLevel()\t" + cellSignalStrengthLte.getAsuLevel() );
-//                        Log.e("66666", "cellSignalStrengthLte.getCqi()\t" + cellSignalStrengthLte.getCqi() );
-//                        Log.e("66666", "cellSignalStrengthLte.getDbm()\t " + cellSignalStrengthLte.getDbm() );
-//                        Log.e("66666", "cellSignalStrengthLte.getLevel()\t " + cellSignalStrengthLte.getLevel() );
-//                        Log.e("66666", "cellSignalStrengthLte.getRsrp()\t " + cellSignalStrengthLte.getRsrp() );
-//                        Log.e("66666", "cellSignalStrengthLte.getRssi()\t " + cellSignalStrengthLte.getRssi() );
-//                        Log.e("66666", "cellSignalStrengthLte.getRssnr()\t " + cellSignalStrengthLte.getRssnr() );
-//                        Log.e("66666", "cellSignalStrengthLte.getTimingAdvance()\t " + cellSignalStrengthLte.getTimingAdvance() );
-//                        Log.e("66666", "LTE dbm\t " + ss );
+//                       Log.e("66666", "LTE dbm\t " + ss );
                     }
                     else if (cellInfo instanceof CellInfoNr)
                     {
                         CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr)cellInfo).getCellSignalStrength();
-                        ss=cellSignalStrengthNr.getCsiRsrp();
+                        ss1=cellSignalStrengthNr.getCsiRsrp();
+                        ss2=cellSignalStrengthNr.getCsiRsrq();
+                        ss3=cellSignalStrengthNr.getSsRsrp();
+                        ss4=cellSignalStrengthNr.getCsiSinr();
                         type="Nr";
-
-//                        Log.e("66666", "cellSignalStrengthNr.getAsuLevel()\t" + cellSignalStrengthNr.getAsuLevel() );
-//                        Log.e("66666", "cellSignalStrengthNr.getDbm()\t " + cellSignalStrengthNr.getDbm() );
-//                        Log.e("66666", "cellSignalStrengthNr.getLevel()\t " + cellSignalStrengthNr.getLevel() );
-//                        Log.e("66666", "cellSignalStrengthNr.getcsiRsrp()\t " + cellSignalStrengthNr.getCsiRsrp() );
-//                        Log.e("66666", "cellSignalStrengthNr.getCsiRssi()\t " + cellSignalStrengthNr.getCsiRsrq());
-//                        Log.e("66666", "cellSignalStrengthNr.getSsRsrp()\t " + cellSignalStrengthNr.getSsRsrp() );
-//                        Log.e("66666", "cellSignalStrengthNr.getSsRsrq()\t " + cellSignalStrengthNr.getSsRsrq() );
-//                        Log.e("66666", "NR dbm\t " + ss );
+//                      Log.e("66666", "NR dbm\t " + ss );
                     }
-                    if(ss>-128 && ss<0) {
-                        dbms = dbms + ss;
+                    if(ss1>-128 && ss1<0) {
+                        dbm1s = dbm1s + ss1;
+                        if(ss2>-128 && ss2<0)   dbm2s = dbm2s + ss2;
+                        if(ss3>-128 && ss3<0)   dbm3s = dbm3s + ss3;
+                        if(ss4>0 && ss4<100)    dbm4s = dbm4s + ss4;
+
                         counter++;
                     }
                 }
             }
 //            Log.e("66666", "size\t " + counter );
-            if(counter!=0)
-                dbm = dbms/counter;
+            if(counter!=0) {
+                dbm1 = dbm1s / counter;
+                dbm2 = dbm2s / counter;
+                dbm3 = dbm3s / counter;
+                dbm4 = dbm4s / counter;
+            }
         }
 //             Log.e("66666", "last dbm\t " + dbm );
             }
@@ -309,156 +331,177 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         tm.requestCellInfoUpdate(this.getMainExecutor(), cellInfoCallback);
-
-//        Timer timer = new Timer();
-//        timer.scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                    // TODO: Consider calling
-//                    //    ActivityCompat#requestPermissions
-//                    // here to request the missing permissions, and then overriding
-//                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                    //                                          int[] grantResults)
-//                    // to handle the case where the user grants the permission. See the documentation
-//                    // for ActivityCompat#requestPermissions for more details.
-//                    return;
-//                }
-//                tm.requestCellInfoUpdate(minThreadExecutor, new TelephonyManager.CellInfoCallback() {
-//                    @Override
-//                    public void onCellInfo(@NonNull List<CellInfo> list) {
-//                        //Extract needed data
-//                    }
-//                });
-//            }
-//        }, 1000, 1000);
-
     }
 
-    public void getMobileDbm() {
-
-        TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-
-//        List<CellSignalStrengthLte> strengthNrList = null;
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-//            strengthNrList = tm.getSignalStrength().getCellSignalStrengths(CellSignalStrengthLte.class);
+//    public void getMobileDbm() {
+//
+//        TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
 //        }
-//        Log.e("123","strengthNrList" + strengthNrList);
-
-        int ss = 0;
-        int counter = 0;
-        int dbms = 0;
-        List<CellInfo> cellInfoList = tm.getAllCellInfo();
-        //List<Integer> dbms = new ArrayList<>();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-        {
-            if (null != cellInfoList)
-            {
-                for (CellInfo cellInfo : cellInfoList)
-                {
-                    if (cellInfo instanceof CellInfoGsm)
-                    {
-                        CellSignalStrengthGsm cellSignalStrengthGsm = ((CellInfoGsm)cellInfo).getCellSignalStrength();
-                        ss = cellSignalStrengthGsm.getDbm();
-                        //Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
-                        Log.e("66666", "gsm dbm\t " + ss );
-                    }
-                    else if (cellInfo instanceof CellInfoCdma)
-                    {
-                        CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma)cellInfo).getCellSignalStrength();
-                        ss = cellSignalStrengthCdma.getDbm();
-                        //Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
-                        Log.e("66666", "cdma dbm\t " + ss );
-                    }
-                    else if (cellInfo instanceof CellInfoWcdma)
-                    {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                        {
-                            CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma)cellInfo).getCellSignalStrength();
-                            ss = cellSignalStrengthWcdma.getDbm();
-//                            Log.e("66666", "cellSignalStrengthWcdma" + cellSignalStrengthWcdma.toString() );
-                            Log.e("66666", "wcdma dbm\t " + ss );
-                        }
-                    }
-                    else if (cellInfo instanceof CellInfoLte)
-                    {
-                        CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte)cellInfo).getCellSignalStrength();
-                        ss=cellSignalStrengthLte.getRssi();
-
-//                        Log.e("66666", "cellSignalStrengthLte.getAsuLevel()\t" + cellSignalStrengthLte.getAsuLevel() );
-//                        Log.e("66666", "cellSignalStrengthLte.getCqi()\t" + cellSignalStrengthLte.getCqi() );
-//                        Log.e("66666", "cellSignalStrengthLte.getDbm()\t " + cellSignalStrengthLte.getDbm() );
-//                        Log.e("66666", "cellSignalStrengthLte.getLevel()\t " + cellSignalStrengthLte.getLevel() );
-//                        Log.e("66666", "cellSignalStrengthLte.getRsrp()\t " + cellSignalStrengthLte.getRsrp() );
-//                        Log.e("66666", "cellSignalStrengthLte.getRssi()\t " + cellSignalStrengthLte.getRssi() );
-//                        Log.e("66666", "cellSignalStrengthLte.getRssnr()\t " + cellSignalStrengthLte.getRssnr() );
-//                        Log.e("66666", "cellSignalStrengthLte.getTimingAdvance()\t " + cellSignalStrengthLte.getTimingAdvance() );
-//                        Log.e("66666", "LTE dbm\t " + ss );
-                    }
-                    else if (cellInfo instanceof CellInfoNr)
-                    {
-                        CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr)cellInfo).getCellSignalStrength();
-                        ss=cellSignalStrengthNr.getCsiRsrp();
-
-//                        Log.e("66666", "cellSignalStrengthNr.getAsuLevel()\t" + cellSignalStrengthNr.getAsuLevel() );
-//                        Log.e("66666", "cellSignalStrengthNr.getDbm()\t " + cellSignalStrengthNr.getDbm() );
-//                        Log.e("66666", "cellSignalStrengthNr.getLevel()\t " + cellSignalStrengthNr.getLevel() );
-//                        Log.e("66666", "cellSignalStrengthNr.getcsiRsrp()\t " + cellSignalStrengthNr.getCsiRsrp() );
-//                        Log.e("66666", "cellSignalStrengthNr.getCsiRssi()\t " + cellSignalStrengthNr.getCsiRsrq());
-//                        Log.e("66666", "cellSignalStrengthNr.getSsRsrp()\t " + cellSignalStrengthNr.getSsRsrp() );
-//                        Log.e("66666", "cellSignalStrengthNr.getSsRsrq()\t " + cellSignalStrengthNr.getSsRsrq() );
-//                        Log.e("66666", "NR dbm\t " + ss );
-                    }
-                    dbms=dbms+ss;
-                    counter++;
-                }
-            }
-            //Collections.sort(dbms);
-//            Log.e("66666", "size\t " + counter );
-            if(counter!=0)
-                dbm = dbms/counter;
-            //if (dbms.size() > 1) {
-            //    dbm=dbms.get/dbms.size();
-            //}
-            //else
-            //    dbm = ss;
-        }
-//         Log.e("66666", "last dbm\t " + dbm );
-    }
+//
+////        List<CellSignalStrengthLte> strengthNrList = null;
+////        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+////            strengthNrList = tm.getSignalStrength().getCellSignalStrengths(CellSignalStrengthLte.class);
+////        }
+////        Log.e("123","strengthNrList" + strengthNrList);
+//
+//        int ss = 0;
+//        int counter = 0;
+//        int dbm1s = 0;
+//        List<CellInfo> cellInfoList = tm.getAllCellInfo();
+//        //List<Integer> dbms = new ArrayList<>();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+//        {
+//            if (null != cellInfoList)
+//            {
+//                for (CellInfo cellInfo : cellInfoList)
+//                {
+//                    if (cellInfo instanceof CellInfoGsm)
+//                    {
+//                        CellSignalStrengthGsm cellSignalStrengthGsm = ((CellInfoGsm)cellInfo).getCellSignalStrength();
+//                        ss = cellSignalStrengthGsm.getDbm();
+//                        //Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
+//                        Log.e("66666", "gsm dbm\t " + ss );
+//                    }
+//                    else if (cellInfo instanceof CellInfoCdma)
+//                    {
+//                        CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma)cellInfo).getCellSignalStrength();
+//                        ss = cellSignalStrengthCdma.getDbm();
+//                        //Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
+//                        Log.e("66666", "cdma dbm\t " + ss );
+//                    }
+//                    else if (cellInfo instanceof CellInfoWcdma)
+//                    {
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+//                        {
+//                            CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma)cellInfo).getCellSignalStrength();
+//                            ss = cellSignalStrengthWcdma.getDbm();
+////                            Log.e("66666", "cellSignalStrengthWcdma" + cellSignalStrengthWcdma.toString() );
+//                            Log.e("66666", "wcdma dbm\t " + ss );
+//                        }
+//                    }
+//                    else if (cellInfo instanceof CellInfoLte)
+//                    {
+//                        CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte)cellInfo).getCellSignalStrength();
+//                        ss=cellSignalStrengthLte.getRssi();
+//
+////                        Log.e("66666", "cellSignalStrengthLte.getAsuLevel()\t" + cellSignalStrengthLte.getAsuLevel() );
+////                        Log.e("66666", "cellSignalStrengthLte.getCqi()\t" + cellSignalStrengthLte.getCqi() );
+////                        Log.e("66666", "cellSignalStrengthLte.getDbm()\t " + cellSignalStrengthLte.getDbm() );
+////                        Log.e("66666", "cellSignalStrengthLte.getLevel()\t " + cellSignalStrengthLte.getLevel() );
+////                        Log.e("66666", "cellSignalStrengthLte.getRsrp()\t " + cellSignalStrengthLte.getRsrp() );
+////                        Log.e("66666", "cellSignalStrengthLte.getRssi()\t " + cellSignalStrengthLte.getRssi() );
+////                        Log.e("66666", "cellSignalStrengthLte.getRssnr()\t " + cellSignalStrengthLte.getRssnr() );
+////                        Log.e("66666", "cellSignalStrengthLte.getTimingAdvance()\t " + cellSignalStrengthLte.getTimingAdvance() );
+////                        Log.e("66666", "LTE dbm\t " + ss );
+//                    }
+//                    else if (cellInfo instanceof CellInfoNr)
+//                    {
+//                        CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr)cellInfo).getCellSignalStrength();
+//                        ss=cellSignalStrengthNr.getCsiRsrp();
+//
+////                        Log.e("66666", "cellSignalStrengthNr.getAsuLevel()\t" + cellSignalStrengthNr.getAsuLevel() );
+////                        Log.e("66666", "cellSignalStrengthNr.getDbm()\t " + cellSignalStrengthNr.getDbm() );
+////                        Log.e("66666", "cellSignalStrengthNr.getLevel()\t " + cellSignalStrengthNr.getLevel() );
+////                        Log.e("66666", "cellSignalStrengthNr.getcsiRsrp()\t " + cellSignalStrengthNr.getCsiRsrp() );
+////                        Log.e("66666", "cellSignalStrengthNr.getCsiRssi()\t " + cellSignalStrengthNr.getCsiRsrq());
+////                        Log.e("66666", "cellSignalStrengthNr.getSsRsrp()\t " + cellSignalStrengthNr.getSsRsrp() );
+////                        Log.e("66666", "cellSignalStrengthNr.getSsRsrq()\t " + cellSignalStrengthNr.getSsRsrq() );
+////                        Log.e("66666", "NR dbm\t " + ss );
+//                    }
+//                    dbm1s=dbm1s+ss;
+//                    counter++;
+//                }
+//            }
+//            //Collections.sort(dbms);
+////            Log.e("66666", "size\t " + counter );
+//            if(counter!=0)
+//                dbm1 = dbm1s/counter;
+//            //if (dbms.size() > 1) {
+//            //    dbm=dbms.get/dbms.size();
+//            //}
+//            //else
+//            //    dbm = ss;
+//        }
+////         Log.e("66666", "last dbm\t " + dbm );
+//    }
 
     private void showtext() {
         if(!flag&&!BLE_flag) {
             try {
                 if (mode) {
-                    message = String.valueOf(dbm);
+                    message = String.valueOf(dbm1);
                     if(type == "Nr")
-                        sendView.setText("Nr_CsiRsrp:" + message + "dBm" + "\n");
+                        sendView.setText("蓝牙未连接 Nr_CsiRsrp:" + message + "dBm" + "\n");
                     else if(type == "Lte")
-                        sendView.setText("Lte_Rssi:" + message + "dBm" + "\n");
+                        sendView.setText("蓝牙未连接 Lte_Rssi:" + message + "dBm" + "\n");
                     else if (type == "Wcdma")
-                        sendView.setText("Wcdma_signal:" + message + "dBm" + "\n");
+                        sendView.setText("蓝牙未连接 Wcdma_signal:" + message + "dBm" + "\n");
                     else if (type == "Cdma")
-                        sendView.setText("Cdma_signal:" + message + "dBm" + "\n");
+                        sendView.setText("蓝牙未连接 Cdma_signal:" + message + "dBm" + "\n");
                     else if (type == "Gsm")
-                        sendView.setText("Gsm_signal:" + message + "dBm" + "\n");
+                        sendView.setText("蓝牙未连接 Gsm_signal:" + message + "dBm" + "\n");
                 } else {
                     message = String.valueOf(mywifiinfo.getRssi());
-                    sendView.setText("WiFi_RSSI:" + message + "dBm" + "\n");
+                    sendView.setText("蓝牙未连接 WiFi_RSSI:" + message + "dBm" + "\n");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void showinfo() {
+            try {
+                if (mode) {
+                    if(type == "Nr") {
+                        infoButton1.setText("CsiRsrp:" + String.valueOf(dbm1));
+                        infoButton2.setText("CsiRsrq:" + String.valueOf(dbm2));
+                        infoButton3.setText("SsRsrp:" + String.valueOf(dbm3));
+                        infoButton4.setText("CsiSinr:" + String.valueOf(dbm4));
+                    }
+                    else if(type == "Lte") {
+                        infoButton1.setText("Rssi:" + String.valueOf(dbm1));
+                        infoButton2.setText("Rsrp:" + String.valueOf(dbm2));
+                        infoButton3.setText("Rsrq:" + String.valueOf(dbm3));
+                        infoButton4.setText("Rssnr:" + String.valueOf(dbm4));
+                    }
+                    else if (type == "Wcdma") {
+                        infoButton1.setText("");
+                        infoButton2.setText("");
+                        infoButton3.setText("");
+                        infoButton4.setText("");
+                    }
+                    else if (type == "Cdma") {
+                        infoButton1.setText("");
+                        infoButton2.setText("");
+                        infoButton3.setText("");
+                        infoButton4.setText("");
+                    }
+                    else if (type == "Gsm") {
+                        infoButton1.setText("");
+                        infoButton2.setText("");
+                        infoButton3.setText("");
+                        infoButton4.setText("");
+                    }
+                } else {
+                    infoButton1.setText("Rssi:" + String.valueOf(mywifiinfo.getRssi()));
+                    infoButton2.setText("" );
+                    infoButton3.setText("");
+                    infoButton4.setText("");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
     }
 
     private void sendMessage() {
@@ -482,21 +525,21 @@ public class MainActivity extends AppCompatActivity {
                     if (flag) {
                         try {
                             if (mode) {
-                                message = String.valueOf(dbm);
+                                message = String.valueOf(dbm1);
                                 if(type == "Nr")
-                                    sendView.setText("Nr_CsiRsrp:" + message + "dBm" + "\n");
+                                    sendView.setText("蓝牙已连接 Nr CsiRsrp:" + message + "dBm" + "\n");
                                 else if(type == "Lte")
-                                    sendView.setText("Lte_Rssi:" + message + "dBm" + "\n");
+                                    sendView.setText("蓝牙已连接 Lte Rssi:" + message + "dBm" + "\n");
                                 else if (type == "Wcdma")
-                                    sendView.setText("Wcdma:" + message + "dBm" + "\n");
+                                    sendView.setText("蓝牙已连接 Wcdma:" + message + "dBm" + "\n");
                                 else if (type == "Cdma")
-                                    sendView.setText("Cdma:" + message + "dBm" + "\n");
+                                    sendView.setText("蓝牙已连接 Cdma:" + message + "dBm" + "\n");
                                 else if (type == "Gsm")
-                                    sendView.setText("Gsm:" + message + "dBm" + "\n");
+                                    sendView.setText("蓝牙已连接 Gsm:" + message + "dBm" + "\n");
                             }
                             else {
                                 message = String.valueOf(mywifiinfo.getRssi());
-                                sendView.setText("WiFi_RSSI:" + message + "dBm" + "\n");
+                                sendView.setText("蓝牙已连接 WiFi_RSSI:" + message + "dBm" + "\n");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -544,7 +587,24 @@ public class MainActivity extends AppCompatActivity {
         modeButton = findViewById(R.id.mode_button);
         modeButton.setText("类型：移动网络");
         modeButton.setOnClickListener(v -> modechange());
+
+        //  info  init
+        infoButton1 = findViewById(R.id.info_button1);
+        infoButton1.setText("");
+        infoButton1.setOnClickListener(v -> chartchange(1));
+        infoButton2 = findViewById(R.id.info_button2);
+        infoButton2.setText("");
+        infoButton2.setOnClickListener(v -> chartchange(2));
+        infoButton3 = findViewById(R.id.info_button3);
+        infoButton3.setText("");
+        infoButton3.setOnClickListener(v -> chartchange(3));
+        infoButton4= findViewById(R.id.info_button4);
+        infoButton4.setText("");
+        infoButton4.setOnClickListener(v -> chartchange(4));
+
     }
+
+    private void chartchange(int tp){ charttype = tp; }
 
     private void initBluetooth() {
         myBluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
@@ -658,9 +718,8 @@ public class MainActivity extends AppCompatActivity {
                 mywifiinfo = mywifiManager.getConnectionInfo();
                 getDbm();
                 showtext();
+                showinfo();
 
-                //getMobileDbm();
-                //getMobileNetworkSignal();
             }
         };
             Timer myTimer = new Timer();
@@ -691,18 +750,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //设置X 轴的显示
     private void getAxisXLables() {
         for (int i = 0; i < timeline.length; i++) {
             mAxisXValues.add(new AxisValue(i).setLabel(timeline[i]));
         }
-    }
-    //图表的每个点的显示
+    }//设置X 轴的显示
+
     private void getAxisPoints() {
         for (int i = 0; i < signal.length; i++) {
             mPointValues.add(new PointValue(i, signal[i]));
         }
-    }
+    }   //图表的每个点的显示
+
     private void initLineChart() {
         Line line = new Line(mPointValues).setColor(Color.parseColor("#FFCD41"));  //折线的颜色（橙色）
         List<Line> lines = new ArrayList<Line>();
@@ -744,8 +803,22 @@ public class MainActivity extends AppCompatActivity {
         lineChart.setVisibility(View.VISIBLE);
 
         Viewport v = new Viewport(lineChart.getMaximumViewport());
-        v.bottom = -120;
-        v.top = -10;
+        if (charttype==1){
+            v.bottom = -120;
+            v.top = -10;
+        }
+        else if(charttype==2){
+            v.bottom = -120;
+            v.top = -10;
+        }
+        else if(charttype==3){
+            v.bottom = -60;
+            v.top = -1;
+        }
+        else if(charttype==4){
+            v.bottom = 0;
+            v.top = 50;
+        }
         lineChart.setMaximumViewport(v);
         v.left = 0;
         v.right = 30;
@@ -760,17 +833,35 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 mPointValues.clear();
                 for(int label=0;label<29;label++) {
-                    signal[label]=signal[label+1];
+                    if (type=="Nr"||type=="Lte") {
+                        signal1[label] = signal1[label + 1];
+                        signal2[label] = signal2[label + 1];
+                        signal3[label] = signal3[label + 1];
+                        signal4[label] = signal4[label + 1];
+                    }
+                    signalwifi[label] = signalwifi[label + 1];
+
                 }
+                if (type=="Nr"||type=="Lte") {
+                    if (dbm4 > -2 && dbm4 < 100)  signal4[29] = dbm4;
+                    if (dbm3 > -128 && dbm3 < 0)  signal3[29] = dbm3;
+                    if (dbm2 > -128 && dbm2 < 0)  signal2[29] = dbm2;
+                    if (dbm1 > -128 && dbm1 < 0)  signal1[29] = dbm1;
+                }
+                signalwifi[29]=mywifiinfo.getRssi();
                 if (mode) {
-                    if(dbm>-125 && dbm<-10)
-                    signal[29]=dbm;
+                    if (type=="Nr"||type=="Lte") {
+                        if (charttype == 1) signal = signal1;
+                        else if (charttype == 2) signal = signal2;
+                        else if (charttype == 3) signal = signal3;
+                        else if (charttype == 4) signal = signal4;
+                    }
                 }
                 else{
-                    signal[29]=mywifiinfo.getRssi();
+                    signal=signalwifi;
                 }
                 getAxisPoints();//获取坐标点
-//                getAxisXLables();//获取x轴的标注
+//              getAxisXLables();//获取x轴的标注
                 initLineChart();
 
             }
