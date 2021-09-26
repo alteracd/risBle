@@ -166,30 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("perm", "权限\t "  );
             }
         }
-    }
-
-//    public void checkPermissions( Context context){
-//        int PERMISSION_ALL = 1;
-//        String[] PERMISSIONS = {
-//                Manifest.permission.ACCESS_FINE_LOCATION,
-//                Manifest.permission.BLUETOOTH,
-//                Manifest.permission.BLUETOOTH_ADMIN,
-//                Manifest.permission.BLUETOOTH_PRIVILEGED,
-//        };
-//        if(!hasPermissions(context, PERMISSIONS)){
-//            this.requestPermissions( PERMISSIONS, PERMISSION_ALL);
-//        }
-//    }
-//    public boolean hasPermissions(Context context, String... permissions) {
-//        if (context != null && permissions != null) {
-//            for (String permission : permissions) {
-//                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
-//    }
+    } //蓝牙权限检查与获取
 
     private void scanLeDevice() {
         if (!scanning) {
@@ -213,8 +190,8 @@ public class MainActivity extends AppCompatActivity {
         for(int i=0;i<30;i++) {
             signal[i] = -130;
         }
-        mPointValues.clear();
-    }
+//        mPointValues.clear();
+    }//清除曲线图
 
     public void modechange() {
         clearline();
@@ -225,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
             mode = true;
             modeButton.setText("类型：移动网络");
         }
-    }
+    } //网络类型切换
 
     public void getDbm() {
 
@@ -286,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
                         ss3=cellSignalStrengthLte.getRsrq();
                         ss4=cellSignalStrengthLte.getRssnr();
                         type="Lte";
+                        Toast.makeText(MainActivity.this, "Lte4g"+ ss1, Toast.LENGTH_SHORT).show();
 //                       Log.e("66666", "LTE dbm\t " + ss );
                     }
                     else if (cellInfo instanceof CellInfoNr)
@@ -297,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
                         ss4=cellSignalStrengthNr.getCsiSinr();
                         type="Nr";
 //                      Log.e("66666", "NR dbm\t " + ss );
+                        Toast.makeText(MainActivity.this, "NR5g"+ ss1, Toast.LENGTH_SHORT).show();
                     }
                     if(ss1>-128 && ss1<0) {
                         dbm1s = dbm1s + ss1;
@@ -331,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         tm.requestCellInfoUpdate(this.getMainExecutor(), cellInfoCallback);
-    }
+    }//获取信号强度
 
 //    public void getMobileDbm() {
 //
@@ -457,7 +436,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-    }
+    }//
 
     @SuppressLint("SetTextI18n")
     private void showinfo() {
@@ -493,6 +472,13 @@ public class MainActivity extends AppCompatActivity {
                         infoButton3.setText("");
                         infoButton4.setText("");
                     }
+                    else {
+                        infoButton1.setText("");
+                        infoButton2.setText("");
+                        infoButton3.setText("");
+                        infoButton4.setText("");
+                    }
+
                 } else {
                     infoButton1.setText("Rssi:" + String.valueOf(mywifiinfo.getRssi()));
                     infoButton2.setText("" );
@@ -502,7 +488,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-    }
+    }//图表上方按钮信息显示
 
     private void sendMessage() {
         if(!BLE){
@@ -555,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
             Timer myTimer = new Timer();
             myTimer.schedule(myTimerTask, 0, 100);
         }
-    }
+    } //蓝牙信息发送
 
     void initView() throws UnsupportedEncodingException {
 
@@ -602,9 +588,17 @@ public class MainActivity extends AppCompatActivity {
         infoButton4.setText("");
         infoButton4.setOnClickListener(v -> chartchange(4));
 
-    }
+    } //蓝牙列表 按键初始化
 
-    private void chartchange(int tp){ charttype = tp; }
+    private void showSearchList() {
+//        scanning = false;
+//        myBluetoothLeScanner.stopScan(leScanCallback);
+//        leDeviceListAdapter.clear();
+//        scanning = true;
+//        myBluetoothLeScanner.startScan(leScanCallback);
+        scanLeDevice();
+        searchList.setAdapter(leDeviceListAdapter);
+    }//蓝牙列表
 
     private void initBluetooth() {
         myBluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
@@ -708,7 +702,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-    }
+    }//蓝牙启动、设置与连接
 
     private void initWiFi_Mobile() {
         TimerTask myTimerTask = new TimerTask() {
@@ -719,12 +713,11 @@ public class MainActivity extends AppCompatActivity {
                 getDbm();
                 showtext();
                 showinfo();
-
             }
         };
             Timer myTimer = new Timer();
             myTimer.schedule(myTimerTask, 0, 100);
-    }
+    }//启动信号强度获取定时器
 
     private void initUUID() {
 
@@ -738,17 +731,6 @@ public class MainActivity extends AppCompatActivity {
         UUID_CHAR_READ = UUID.fromString("6e400003-b5a3-f393-e0A9-e50e24dcca9e");
          */
     }
-
-    private void showSearchList() {
-//        scanning = false;
-//        myBluetoothLeScanner.stopScan(leScanCallback);
-//        leDeviceListAdapter.clear();
-//        scanning = true;
-//        myBluetoothLeScanner.startScan(leScanCallback);
-        scanLeDevice();
-        searchList.setAdapter(leDeviceListAdapter);
-    }
-
 
     private void getAxisXLables() {
         for (int i = 0; i < timeline.length; i++) {
@@ -824,7 +806,9 @@ public class MainActivity extends AppCompatActivity {
         v.right = 30;
         lineChart.setCurrentViewport(v);
 
-    }
+    } //设置并显示图表
+
+    private void chartchange(int tp){ charttype = tp; }//曲线图切换
 
     private void refresh(){
 
@@ -863,14 +847,13 @@ public class MainActivity extends AppCompatActivity {
                 getAxisPoints();//获取坐标点
 //              getAxisXLables();//获取x轴的标注
                 initLineChart();
-
             }
         };
         Timer myTimer = new Timer();
         myTimer.schedule(myTimerTask, 10, 1000);
 
 
-    }
+    }//曲线图刷新
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
