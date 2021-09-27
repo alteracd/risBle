@@ -115,15 +115,15 @@ public class MainActivity extends AppCompatActivity {
     private int charttype = 1;
 
     private LineChartView lineChart;
-//    private String[] timeline= new String[30] ;//X轴的标注
     private int[] signal= new int[30];//图表的数据点
     private int[] signal1= new int[30];//图表的数据点
     private int[] signal2= new int[30];//图表的数据点
     private int[] signal3= new int[30];//图表的数据点
     private int[] signal4= new int[30];//图表的数据点
     private int[] signalwifi= new int[30];//图表的数据点
-
-    private String[] timeline = {"30s前","29","28","27s前","26","25","24","23","22s前","21","20","19","18","19","18","15","14s前","13","12","11","10s前","9","8","7","6s前","5s前","4","3","2","1"};//X轴的标注
+    private String[] timeline = {"30s前","29s前","28s前","27s前","26s前","25","24s前","23s前",
+            "22s前","21s前","20s前","19s前","18","19","18","15s前","14s前","13s前","12s前",
+            "11s前","10s前","9s前","8","7","6s前","5s前","4s前","3s前","2","1"};//X轴的标注
 //    private int[] signal= {74,22,18,79,20,74,20,74,42,90,74,42,90,50,42,90,33,10,74,22,18,79,20,74,22,18,79,20};//图表的数据
     private List<PointValue> mPointValues = new ArrayList<PointValue>();
     private List<AxisValue> mAxisXValues = new ArrayList<AxisValue>();
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i=0;i<30;i++) {
             signal[i] = -130;
         }
-//        mPointValues.clear();
+        mPointValues.clear();
     }//清除曲线图
 
     public void modechange() {
@@ -262,8 +262,9 @@ public class MainActivity extends AppCompatActivity {
                         ss2=cellSignalStrengthLte.getRsrp();
                         ss3=cellSignalStrengthLte.getRsrq();
                         ss4=cellSignalStrengthLte.getRssnr();
+//                        Log.e("66666", "\t " + ss4);
                         type="Lte";
-                        Toast.makeText(MainActivity.this, "Lte4g"+ ss1, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, "Lte4g"+ ss1, Toast.LENGTH_SHORT).show();
 //                       Log.e("66666", "LTE dbm\t " + ss );
                     }
                     else if (cellInfo instanceof CellInfoNr)
@@ -273,16 +274,16 @@ public class MainActivity extends AppCompatActivity {
                         ss2=cellSignalStrengthNr.getCsiRsrq();
                         ss3=cellSignalStrengthNr.getSsRsrp();
                         ss4=cellSignalStrengthNr.getCsiSinr();
+//                        Log.e("66666", "\t " + ss4);
                         type="Nr";
 //                      Log.e("66666", "NR dbm\t " + ss );
-                        Toast.makeText(MainActivity.this, "NR5g"+ ss1, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, "NR5g"+ ss1, Toast.LENGTH_SHORT).show();
                     }
                     if(ss1>-128 && ss1<0) {
                         dbm1s = dbm1s + ss1;
                         if(ss2>-128 && ss2<0)   dbm2s = dbm2s + ss2;
                         if(ss3>-128 && ss3<0)   dbm3s = dbm3s + ss3;
                         if(ss4>0 && ss4<100)    dbm4s = dbm4s + ss4;
-
                         counter++;
                     }
                 }
@@ -293,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
                 dbm2 = dbm2s / counter;
                 dbm3 = dbm3s / counter;
                 dbm4 = dbm4s / counter;
+
             }
         }
 //             Log.e("66666", "last dbm\t " + dbm );
@@ -428,6 +430,9 @@ public class MainActivity extends AppCompatActivity {
                         sendView.setText("蓝牙未连接 Cdma_signal:" + message + "dBm" + "\n");
                     else if (type == "Gsm")
                         sendView.setText("蓝牙未连接 Gsm_signal:" + message + "dBm" + "\n");
+                    else{
+                        sendView.setText("蓝牙未连接 无信号");
+                    }
                 } else {
                     message = String.valueOf(mywifiinfo.getRssi());
                     sendView.setText("蓝牙未连接 WiFi_RSSI:" + message + "dBm" + "\n");
@@ -446,12 +451,14 @@ public class MainActivity extends AppCompatActivity {
                         infoButton1.setText("CsiRsrp:" + String.valueOf(dbm1));
                         infoButton2.setText("CsiRsrq:" + String.valueOf(dbm2));
                         infoButton3.setText("SsRsrp:" + String.valueOf(dbm3));
+                        if (dbm4!=0)
                         infoButton4.setText("CsiSinr:" + String.valueOf(dbm4));
                     }
                     else if(type == "Lte") {
                         infoButton1.setText("Rssi:" + String.valueOf(dbm1));
                         infoButton2.setText("Rsrp:" + String.valueOf(dbm2));
                         infoButton3.setText("Rsrq:" + String.valueOf(dbm3));
+                        if (dbm4!=0)
                         infoButton4.setText("Rssnr:" + String.valueOf(dbm4));
                     }
                     else if (type == "Wcdma") {
@@ -835,14 +842,19 @@ public class MainActivity extends AppCompatActivity {
                 signalwifi[29]=mywifiinfo.getRssi();
                 if (mode) {
                     if (type=="Nr"||type=="Lte") {
-                        if (charttype == 1) signal = signal1;
-                        else if (charttype == 2) signal = signal2;
-                        else if (charttype == 3) signal = signal3;
-                        else if (charttype == 4) signal = signal4;
+                        if (charttype == 1) //signal = signal1;
+                            System.arraycopy(signal1, 0, signal, 0, signal1.length);
+                        else if (charttype == 2) //signal = signal2;
+                            System.arraycopy(signal2, 0, signal, 0, signal2.length);
+                        else if (charttype == 3) //signal = signal3;
+                            System.arraycopy(signal3, 0, signal, 0, signal3.length);
+                        else if (charttype == 4) //signal = signal4;
+                            System.arraycopy(signal4, 0, signal, 0, signal4.length);
                     }
                 }
                 else{
-                    signal=signalwifi;
+//                    signal=signalwifi;
+                    System.arraycopy(signalwifi, 0, signal, 0, signalwifi.length);
                 }
                 getAxisPoints();//获取坐标点
 //              getAxisXLables();//获取x轴的标注
@@ -861,10 +873,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         lineChart = (LineChartView)findViewById(R.id.line_chart);
-        clearline();
+//        clearline();
         getAxisXLables();//获取x轴的标注
-        getAxisPoints();//获取坐标点
-        initLineChart();//初始化
+//        getAxisPoints();//获取坐标点
+//        initLineChart();//初始化
         refresh();
 
         getBlePermissionFromSys();
