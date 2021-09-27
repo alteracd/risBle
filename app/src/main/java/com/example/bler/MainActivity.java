@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String message = "";
     private String  mobileNetworkSignal= "";
+    private String  type= "";
     private boolean flag = false;
     private boolean BLE_flag = false;
     private boolean BLE = false;
@@ -352,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         CellSignalStrengthGsm cellSignalStrengthGsm = ((CellInfoGsm)cellInfo).getCellSignalStrength();
                         ss = cellSignalStrengthGsm.getDbm();
+                        type="Gsm";
                         //Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
                         Log.e("66666", "gsm dbm\t " + ss );
                     }
@@ -359,6 +361,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma)cellInfo).getCellSignalStrength();
                         ss = cellSignalStrengthCdma.getDbm();
+                        type="Cdma";
                         //Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
                         Log.e("66666", "cdma dbm\t " + ss );
                     }
@@ -368,6 +371,7 @@ public class MainActivity extends AppCompatActivity {
                         {
                             CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma)cellInfo).getCellSignalStrength();
                             ss = cellSignalStrengthWcdma.getDbm();
+                            type="Wcdma";
                             //Log.e("66666", "cellSignalStrengthWcdma" + cellSignalStrengthWcdma.toString() );
                             Log.e("66666", "wcdma dbm\t " + ss );
                         }
@@ -375,8 +379,8 @@ public class MainActivity extends AppCompatActivity {
                     else if (cellInfo instanceof CellInfoLte)
                     {
                         CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte)cellInfo).getCellSignalStrength();
-                        ss=cellSignalStrengthLte.getDbm();
-
+                        ss=cellSignalStrengthLte.getRssi();
+                        type="Lte";
 //                        Log.e("66666", "cellSignalStrengthLte.getAsuLevel()\t" + cellSignalStrengthLte.getAsuLevel() );
 //                        Log.e("66666", "cellSignalStrengthLte.getCqi()\t" + cellSignalStrengthLte.getCqi() );
 //                        Log.e("66666", "cellSignalStrengthLte.getDbm()\t " + cellSignalStrengthLte.getDbm() );
@@ -385,13 +389,13 @@ public class MainActivity extends AppCompatActivity {
 //                        Log.e("66666", "cellSignalStrengthLte.getRssi()\t " + cellSignalStrengthLte.getRssi() );
 //                        Log.e("66666", "cellSignalStrengthLte.getRssnr()\t " + cellSignalStrengthLte.getRssnr() );
 //                        Log.e("66666", "cellSignalStrengthLte.getTimingAdvance()\t " + cellSignalStrengthLte.getTimingAdvance() );
-//
-                        Log.e("66666", "LTE dbm\t " + ss );
+//                        Log.e("66666", "LTE dbm\t " + ss );
                     }
                     else if (cellInfo instanceof CellInfoNr)
                     {
                         CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr)cellInfo).getCellSignalStrength();
                         ss=cellSignalStrengthNr.getCsiRsrp();
+                        type="Nr";
 
 //                        Log.e("66666", "cellSignalStrengthNr.getAsuLevel()\t" + cellSignalStrengthNr.getAsuLevel() );
 //                        Log.e("66666", "cellSignalStrengthNr.getDbm()\t " + cellSignalStrengthNr.getDbm() );
@@ -400,11 +404,12 @@ public class MainActivity extends AppCompatActivity {
 //                        Log.e("66666", "cellSignalStrengthNr.getCsiRssi()\t " + cellSignalStrengthNr.getCsiRsrq());
 //                        Log.e("66666", "cellSignalStrengthNr.getSsRsrp()\t " + cellSignalStrengthNr.getSsRsrp() );
 //                        Log.e("66666", "cellSignalStrengthNr.getSsRsrq()\t " + cellSignalStrengthNr.getSsRsrq() );
-
-                        Log.e("66666", "NR dbm\t " + ss );
+//                        Log.e("66666", "NR dbm\t " + ss );
                     }
-                    dbms=dbms+ss;
-                    counter++;
+                    if(ss>-128 && ss<0) {
+                        dbms = dbms + ss;
+                        counter++;
+                    }
                 }
             }
             Log.e("66666", "size\t " + counter );
@@ -663,7 +668,16 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (mode) {
                     message = String.valueOf(dbm);
-                    sendView.setText("data_CsiRsrp:" + message + "dBm" + "\n");
+                    if(type == "Nr")
+                        sendView.setText("Nr_CsiRsrp:" + message + "dBm" + "\n");
+                    else if(type == "Lte")
+                        sendView.setText("Lte_Rssi:" + message + "dBm" + "\n");
+                    else if (type == "Wcdma")
+                        sendView.setText("Wcdma_signal:" + message + "dBm" + "\n");
+                    else if (type == "Cdma")
+                        sendView.setText("Cdma_signal:" + message + "dBm" + "\n");
+                    else if (type == "Gsm")
+                        sendView.setText("Gsm_signal:" + message + "dBm" + "\n");
                 } else {
                     message = String.valueOf(mywifiinfo.getRssi());
                     sendView.setText("WiFi_RSSI:" + message + "dBm" + "\n");
@@ -697,7 +711,16 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             if (mode) {
                                 message = String.valueOf(dbm);
-                                sendView.setText("data_CsiRsrp:" + message + "dBm" + "\n");
+                                if(type == "Nr")
+                                    sendView.setText("Nr_CsiRsrp:" + message + "dBm" + "\n");
+                                else if(type == "Lte")
+                                    sendView.setText("Lte_Rssi:" + message + "dBm" + "\n");
+                                else if (type == "Wcdma")
+                                    sendView.setText("Wcdma:" + message + "dBm" + "\n");
+                                else if (type == "Cdma")
+                                    sendView.setText("Cdma:" + message + "dBm" + "\n");
+                                else if (type == "Gsm")
+                                    sendView.setText("Gsm:" + message + "dBm" + "\n");
                             }
                             else {
                                 message = String.valueOf(mywifiinfo.getRssi());
