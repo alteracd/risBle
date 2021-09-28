@@ -458,31 +458,36 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     private void showtext() {
-        if(!flag) {
             try {
                 if (mode) {
                     message = String.valueOf(dbm1);
                     if(type == "Nr")
-                        sendView.setText("蓝牙未连接 Nr_SsRsrp:" + message + "dBm" + "\n");
+                        if (BLE) sendView.setText("蓝牙已连接 Nr_SsRsrp:" + message + "dBm" + "\n");
+                        else sendView.setText("蓝牙未连接 Nr_SsRsrp:" + message + "dBm" + "\n");
                     else if(type == "Lte")
-                        sendView.setText("蓝牙未连接 Lte_Rssi:" + message + "dBm" + "\n");
+                        if (BLE) sendView.setText("蓝牙已连接 Lte_Rssi:" + message + "dBm" + "\n");
+                        else sendView.setText("蓝牙未连接 Lte_Rssi:" + message + "dBm" + "\n");
                     else if (type == "Wcdma")
-                        sendView.setText("蓝牙未连接 Wcdma_signal:" + message + "dBm" + "\n");
+                        if (BLE) sendView.setText("蓝牙已连接 Wcdma_signal:" + message + "dBm" + "\n");
+                        else sendView.setText("蓝牙未连接 Wcdma_signal:" + message + "dBm" + "\n");
                     else if (type == "Cdma")
-                        sendView.setText("蓝牙未连接 Cdma_signal:" + message + "dBm" + "\n");
+                        if (BLE) sendView.setText("蓝牙已连接 Cdma_signal:" + message + "dBm" + "\n");
+                        else sendView.setText("蓝牙未连接 Cdma_signal:" + message + "dBm" + "\n");
                     else if (type == "Gsm")
-                        sendView.setText("蓝牙未连接 Gsm_signal:" + message + "dBm" + "\n");
+                        if (BLE) sendView.setText("蓝牙已连接 Gsm_signal:" + message + "dBm" + "\n");
+                        else sendView.setText("蓝牙未连接 Gsm_signal:" + message + "dBm" + "\n");
                     else{
-                        sendView.setText("蓝牙未连接 无信号");
+                        if (BLE) sendView.setText("蓝牙已连接 无信号");
+                        else sendView.setText("蓝牙未连接 无信号");
                     }
                 } else {
                     message = String.valueOf(mywifiinfo.getRssi());
-                    sendView.setText("蓝牙未连接 WiFi_RSSI:" + message + "dBm" + "\n");
+                    if (BLE) sendView.setText("蓝牙已连接 WiFi_RSSI:" + message + "dBm" + "\n");
+                    else sendView.setText("蓝牙未连接 WiFi_RSSI:" + message + "dBm" + "\n");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
     }//
 
     @SuppressLint("SetTextI18n")
