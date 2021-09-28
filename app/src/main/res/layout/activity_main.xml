@@ -24,11 +24,11 @@
 
         <Button
             android:id="@+id/info_button1"
-            android:layout_width="wrap_content"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:background="@drawable/infobutton"
             android:textColor="@color/black"
-            android:textSize="9.0sp" />
+            android:textSize="8.0sp" />
 
         <Button
             android:id="@+id/info_button2"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/infobutton"
             android:textColor="@color/black"
-            android:textSize="9.0sp" />
+            android:textSize="8.0sp" />
 
         <Button
             android:id="@+id/info_button3"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/infobutton"
             android:textColor="@color/black"
-            android:textSize="9.0sp" />
+            android:textSize="8.0sp" />
 
         <Button
             android:id="@+id/info_button4"
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/infobutton"
             android:textColor="@color/black"
-            android:textSize="9.0sp" />
+            android:textSize="8.0sp" />
     </LinearLayout>
 
     <lecho.lib.hellocharts.view.LineChartView

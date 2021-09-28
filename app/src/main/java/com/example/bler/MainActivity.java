@@ -224,6 +224,10 @@ public class MainActivity extends AppCompatActivity {
                 double dbm2s = 0;
                 double dbm3s = 0;
                 double dbm4s = 0;
+                double Ltedbm1s = 0;
+                double Ltedbm2s = 0;
+                double Ltedbm3s = 0;
+                double Ltedbm4s = 0;
                 double Nrdbm1s = 0;
                 double Nrdbm2s = 0;
                 double Nrdbm3s = 0;
@@ -277,18 +281,18 @@ public class MainActivity extends AppCompatActivity {
                         {
                             CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte)cellInfo).getCellSignalStrength();
                             ss1=cellSignalStrengthLte.getRssi();
-                            ss2=cellSignalStrengthLte.getRsrp();
-                            ss3=cellSignalStrengthLte.getRsrq();
+                            ss3=cellSignalStrengthLte.getRsrp();
+                            ss2=cellSignalStrengthLte.getRsrq();
                             ss4=cellSignalStrengthLte.getRssnr();
     //                        Log.e("66666", "Rssinr:\t " + cellSignalStrengthLte.getRssnr());
     //                        Log.e("66666", "\t " + ss4);
     //                        Toast.makeText(MainActivity.this, "Lte4g"+ ss1, Toast.LENGTH_SHORT).show();
                             type="Lte";
                             if(ss1>-128 && ss1<0) {
-                                dbm1s = dbm1s + ss1;
-                                if(ss2>-128 && ss2<0)   dbm2s = dbm2s + ss2;
-                                if(ss3>-128 && ss3<0)   dbm3s = dbm3s + ss3;
-                                if(ss4>0 && ss4<100)    dbm4s = dbm4s + ss4;
+                                Ltedbm1s = Ltedbm1s + ss1;
+                                if(ss2>-128 && ss2<0)   Ltedbm2s = Ltedbm2s + ss2;
+                                if(ss3>-128 && ss3<0)   Ltedbm3s = Ltedbm3s + ss3;
+                                if(ss4>0 && ss4<100)    Ltedbm4s = Ltedbm4s + ss4;
                                 Ltecounter++;
                             }
     //                       Log.e("66666", "LTE dbm\t " + ss );
@@ -337,10 +341,10 @@ public class MainActivity extends AppCompatActivity {
     //                    Log.e("66666", "Nrcounter :\t " + Nrcounter);
                     }
                     else if(Ltecounter!=0 && type == "Lte") {
-                        dbm1 = dbm1s / Ltecounter;
-                        dbm2 = dbm2s / Ltecounter;
-                        dbm3 = dbm3s / Ltecounter;
-                        dbm4 = dbm4s / Ltecounter;
+                        dbm1 = Ltedbm1s / Ltecounter;
+                        dbm2 = Ltedbm2s / Ltecounter;
+                        dbm3 = Ltedbm3s / Ltecounter;
+                        dbm4 = Ltedbm4s / Ltecounter;
                     }
                     else if(counter!=0){
                         dbm1 = dbm1s / counter;
@@ -514,8 +518,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else if(type == "Lte") {
                         infoButton1.setText("Rssi:\n" + String.format("%.2f",dbm1));
-                        infoButton2.setText("Rsrp:\n" + String.format("%.2f",dbm2));
-                        infoButton3.setText("Rsrq:\n" + String.format("%.2f",dbm3));
+                        infoButton2.setText("Rsrq:\n" + String.format("%.2f",dbm2));
+                        infoButton3.setText("Rsrp:\n" + String.format("%.2f",dbm3));
                         if (dbm4!=0)   infoButton4.setText("Rssnr:\n" + String.format("%.2f",dbm4));
                         else infoButton4.setText("");
                     }
@@ -836,20 +840,20 @@ public class MainActivity extends AppCompatActivity {
 
         Viewport v = new Viewport(lineChart.getMaximumViewport());
         if (charttype==1){
-            v.bottom = -120;
-            v.top = -10;
+            v.bottom = -130;
+            v.top = -40;
         }
         else if(charttype==2){
-            v.bottom = -120;
+            v.bottom = -30;
             v.top = 0;
         }
         else if(charttype==3){
-            v.bottom = -60;
-            v.top = -1;
+            v.bottom = -130;
+            v.top = -40;
         }
         else if(charttype==4){
-            v.bottom = 0;
-            v.top = 50;
+            v.bottom = -20;
+            v.top = 40;
         }
         lineChart.setMaximumViewport(v);
         v.left = 0;
@@ -857,7 +861,14 @@ public class MainActivity extends AppCompatActivity {
         lineChart.setCurrentViewport(v);
 
     } //设置并显示图表
-
+    private void initialsignals(){
+        for(int i=0;i<30;i++){
+            signal1[i]=-130;
+            signal2[i]=-30;
+            signal3[i]=-130;
+            signal4[i]=-20;
+        }
+    }
     private void chartchange(int tp){ charttype = tp; }//曲线图切换
 
     private void refresh(){
@@ -918,6 +929,7 @@ public class MainActivity extends AppCompatActivity {
         getAxisXLables();//获取x轴的标注
 //        getAxisPoints();//获取坐标点
 //        initLineChart();//初始化
+        initialsignals();
         refresh();
 
         getBlePermissionFromSys();
