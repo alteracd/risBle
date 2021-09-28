@@ -94,10 +94,10 @@ public class MainActivity extends AppCompatActivity {
     private Button sendButton;
     private TextView sendView;
 
-    private int dbm1 = -1;
-    private int dbm2 = -1;
-    private int dbm3 = -1;
-    private int dbm4 = -1;
+    private double dbm1 = -1;
+    private double dbm2 = -1;
+    private double dbm3 = -1;
+    private double dbm4 = -1;
     private WifiManager mywifiManager;
     private WifiInfo mywifiinfo;
 
@@ -115,12 +115,12 @@ public class MainActivity extends AppCompatActivity {
     private int charttype = 1;
 
     private LineChartView lineChart;
-    private int[] signal= new int[30];//图表的数据点
-    private int[] signal1= new int[30];//图表的数据点
-    private int[] signal2= new int[30];//图表的数据点
-    private int[] signal3= new int[30];//图表的数据点
-    private int[] signal4= new int[30];//图表的数据点
-    private int[] signalwifi= new int[30];//图表的数据点
+    private double[] signal= new double[30];//图表的数据点
+    private double[] signal1= new double[30];//图表的数据点
+    private double[] signal2= new double[30];//图表的数据点
+    private double[] signal3= new double[30];//图表的数据点
+    private double[] signal4= new double[30];//图表的数据点
+    private double[] signalwifi= new double[30];//图表的数据点
     private String[] timeline = {"30s前","29s前","28s前","27s前","26s前","25","24s前","23s前",
             "22s前","21s前","20s前","19s前","18","19","18","15s前","14s前","13s前","12s前",
             "11s前","10s前","9s前","8","7","6s前","5s前","4s前","3s前","2","1"};//X轴的标注
@@ -213,133 +213,143 @@ public class MainActivity extends AppCompatActivity {
             public void onCellInfo(List<CellInfo> cellInfoList) {
                 // DO SOMETHING
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-        {
-            int ss1 = 0;
-            int ss2 = 0;
-            int ss3 = 0;
-            int ss4 = 0;
-            int counter = 0;
-            int dbm1s = 0;
-            int dbm2s = 0;
-            int dbm3s = 0;
-            int dbm4s = 0;
-            int Nrdbm1s = 0;
-            int Nrdbm2s = 0;
-            int Nrdbm3s = 0;
-            int Nrdbm4s = 0;
-            int Nrcounter = 0;
-
-            if (null != cellInfoList)
             {
-                for (CellInfo cellInfo : cellInfoList)
-                {
-                    if (cellInfo instanceof CellInfoGsm)
-                    {
-                        CellSignalStrengthGsm cellSignalStrengthGsm = ((CellInfoGsm)cellInfo).getCellSignalStrength();
-                        ss1 = cellSignalStrengthGsm.getDbm();
-                        type="Gsm";
-                        //Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
-//                        Log.e("66666", "gsm dbm\t " + ss1 );
-                    }
-                    else if (cellInfo instanceof CellInfoCdma)
-                    {
-                        CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma)cellInfo).getCellSignalStrength();
-                        ss1 = cellSignalStrengthCdma.getDbm();
-                        type="Cdma";
-//                        Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
-//                        Log.e("66666", "cdma dbm\t " + ss1 );
-                    }
-                    else if (cellInfo instanceof CellInfoWcdma)
-                    {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                        {
-                            CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma)cellInfo).getCellSignalStrength();
-                            ss1 = cellSignalStrengthWcdma.getDbm();
-                            type="Wcdma";
-                            //Log.e("66666", "cellSignalStrengthWcdma" + cellSignalStrengthWcdma.toString() );
-//                            Log.e("66666", "wcdma dbm\t " + ss1 );
-                        }
-                    }
-                    else if (cellInfo instanceof CellInfoLte)
-                    {
-                        CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte)cellInfo).getCellSignalStrength();
-                        ss1=cellSignalStrengthLte.getRssi();
-                        ss2=cellSignalStrengthLte.getRsrp();
-                        ss3=cellSignalStrengthLte.getRsrq();
-                        ss4=cellSignalStrengthLte.getRssnr();
-//                        Log.e("66666", "Rssinr:\t " + cellSignalStrengthLte.getRssnr());
-//                        Log.e("66666", "\t " + ss4);
-                        type="Lte";
-//                        Toast.makeText(MainActivity.this, "Lte4g"+ ss1, Toast.LENGTH_SHORT).show();
-                        if(ss1>-128 && ss1<0) {
-                            dbm1s = dbm1s + ss1;
-                            if(ss2>-128 && ss2<0)   dbm2s = dbm2s + ss2;
-                            if(ss3>-128 && ss3<0)   dbm3s = dbm3s + ss3;
-                            if(ss4>0 && ss4<100)    dbm4s = dbm4s + ss4;
-                            counter++;
-                        }
-//                       Log.e("66666", "LTE dbm\t " + ss );
-                    }
-                    else if (cellInfo instanceof CellInfoNr)
-                    {
-                        CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr)cellInfo).getCellSignalStrength();
-//                        ss1=cellSignalStrengthNr.getCsiRsrp();
-//                        ss2=cellSignalStrengthNr.getCsiRsrq();
-//                        ss3=cellSignalStrengthNr.getSsRsrp();
-//                        ss4=cellSignalStrengthNr.getSsSinr();
-                        ss1=-1*cellSignalStrengthNr.getSsRsrp();
-                        ss2=-1*cellSignalStrengthNr.getSsRsrq();
-                        ss3=cellSignalStrengthNr.getCsiRsrp();
-                        ss4=cellSignalStrengthNr.getSsSinr();
-//                        Log.e("66666", "CsiRsrp:\t " + cellSignalStrengthNr.getCsiRsrp());
-//                        Log.e("66666", "CsiRsrq:\t " + cellSignalStrengthNr.getCsiRsrq());
-//                        Log.e("66666", "Ss2 SsRsrq:\t " + ss2);
-//                        Log.e("66666", "ss1 SsRsrp:\t " + ss1);
-//                        Log.e("66666", "SsSinr:\t " + cellSignalStrengthNr.getSsSinr());
-                        type="Nr";
-//                        Toast.makeText(MainActivity.this, "Nr5g"+ ss1, Toast.LENGTH_SHORT).show();
-                        if(ss1>-128 && ss1<0) {
-                            Nrdbm1s = Nrdbm1s + ss1;
-                            if(ss2>-128 && ss2<0)   Nrdbm2s = Nrdbm2s + ss2;
-                            if(ss3>-128 && ss3<0)   Nrdbm3s = Nrdbm3s + ss3;
-                            if(ss4>0 && ss4<100)    Nrdbm4s = Nrdbm4s + ss4;
-                            Nrcounter++;
-                            Log.e("66666", "ss2 :\t " + ss2);
-                            Log.e("66666", "dbm2s :\t " + Nrdbm2s/counter);
-                        }
-//                      Log.e("66666", "NR dbm\t " + ss );
-//                        Toast.makeText(MainActivity.this, "NR5g"+ ss1, Toast.LENGTH_SHORT).show();
-                    }
-//                    if(ss1>-128 && ss1<0) {
-//                        dbm1s = dbm1s + ss1;
-//                        if(ss2>-128 && ss2<0)   dbm2s = dbm2s + ss2;
-//                        if(ss3>-128 && ss3<0)   dbm3s = dbm3s + ss3;
-//                        if(ss4>0 && ss4<100)    dbm4s = dbm4s + ss4;
-//                        counter++;
-//                        Log.e("66666", "ss2 :\t " + ss2);
-//                        Log.e("66666", "dbm2s :\t " + dbm2s/counter);
-//                    }
-                }
-            }
-//            Log.e("66666", "size\t " + counter );
-            if(counter!=0) {
-                if(type == "Nr"){
-                    dbm1 = Nrdbm1s / Nrcounter;
-                    dbm2 = Nrdbm2s / Nrcounter;
-                    dbm3 = Nrdbm3s / Nrcounter;
-                    dbm4 = Nrdbm4s / Nrcounter;
-                    Log.e("66666", "Nrcounter :\t " + Nrcounter);
-                }
-                else {
-                    dbm1 = dbm1s / counter;
-                    dbm2 = dbm2s / counter;
-                    dbm3 = dbm3s / counter;
-                    dbm4 = dbm4s / counter;
-                }
+                int ss1 = 0;
+                int ss2 = 0;
+                int ss3 = 0;
+                int ss4 = 0;
+                int counter = 0;
+                int Ltecounter = 0;
+                double dbm1s = 0;
+                double dbm2s = 0;
+                double dbm3s = 0;
+                double dbm4s = 0;
+                double Nrdbm1s = 0;
+                double Nrdbm2s = 0;
+                double Nrdbm3s = 0;
+                double Nrdbm4s = 0;
+                double Nrcounter = 0;
 
-            }
-        }
-//             Log.e("66666", "last dbm\t " + dbm );
+                if (null != cellInfoList)
+                {
+                    for (CellInfo cellInfo : cellInfoList)
+                    {
+                        if (cellInfo instanceof CellInfoGsm)
+                        {
+                            CellSignalStrengthGsm cellSignalStrengthGsm = ((CellInfoGsm)cellInfo).getCellSignalStrength();
+                            ss1 = cellSignalStrengthGsm.getDbm();
+                            type="Gsm";
+                            if(ss1>-128 && ss1<0) {
+                                dbm1s = dbm1s + ss1;
+                                counter++;
+                            }
+    //                        Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
+    //                        Log.e("66666", "gsm dbm\t " + ss1 );
+                        }
+                        else if (cellInfo instanceof CellInfoCdma)
+                        {
+                            CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma)cellInfo).getCellSignalStrength();
+                            ss1 = cellSignalStrengthCdma.getDbm();
+                            type="Cdma";
+                            if(ss1>-128 && ss1<0) {
+                                dbm1s = dbm1s + ss1;
+                                counter++;
+                            }
+    //                        Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
+    //                        Log.e("66666", "cdma dbm\t " + ss1 );
+                        }
+                        else if (cellInfo instanceof CellInfoWcdma)
+                        {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+                            {
+                                CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma)cellInfo).getCellSignalStrength();
+                                ss1 = cellSignalStrengthWcdma.getDbm();
+    //                            Log.e("66666", "cellSignalStrengthWcdma" + cellSignalStrengthWcdma.toString() );
+    //                            Log.e("66666", "wcdma dbm\t " + ss1 );
+                                type="Wcdma";
+                                if(ss1>-128 && ss1<0) {
+                                    dbm1s = dbm1s + ss1;
+                                    counter++;
+                                }
+                            }
+                        }
+                        else if (cellInfo instanceof CellInfoLte)
+                        {
+                            CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte)cellInfo).getCellSignalStrength();
+                            ss1=cellSignalStrengthLte.getRssi();
+                            ss2=cellSignalStrengthLte.getRsrp();
+                            ss3=cellSignalStrengthLte.getRsrq();
+                            ss4=cellSignalStrengthLte.getRssnr();
+    //                        Log.e("66666", "Rssinr:\t " + cellSignalStrengthLte.getRssnr());
+    //                        Log.e("66666", "\t " + ss4);
+    //                        Toast.makeText(MainActivity.this, "Lte4g"+ ss1, Toast.LENGTH_SHORT).show();
+                            type="Lte";
+                            if(ss1>-128 && ss1<0) {
+                                dbm1s = dbm1s + ss1;
+                                if(ss2>-128 && ss2<0)   dbm2s = dbm2s + ss2;
+                                if(ss3>-128 && ss3<0)   dbm3s = dbm3s + ss3;
+                                if(ss4>0 && ss4<100)    dbm4s = dbm4s + ss4;
+                                Ltecounter++;
+                            }
+    //                       Log.e("66666", "LTE dbm\t " + ss );
+                        }
+                        else if (cellInfo instanceof CellInfoNr)
+                        {
+                            CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr)cellInfo).getCellSignalStrength();
+    //                        ss1=cellSignalStrengthNr.getCsiRsrp();
+    //                        ss2=cellSignalStrengthNr.getCsiRsrq();
+    //                        ss3=cellSignalStrengthNr.getSsRsrp();
+    //                        ss4=cellSignalStrengthNr.getSsSinr();
+                            ss1=-1*cellSignalStrengthNr.getSsRsrp();
+                            ss2=-1*cellSignalStrengthNr.getSsRsrq();
+                            ss3=cellSignalStrengthNr.getCsiRsrp();
+                            ss4=cellSignalStrengthNr.getSsSinr();
+    //                        Log.e("66666", "CsiRsrp:\t " + cellSignalStrengthNr.getCsiRsrp());
+    //                        Log.e("66666", "CsiRsrq:\t " + cellSignalStrengthNr.getCsiRsrq());
+    //                        Log.e("66666", "Ss2 SsRsrq:\t " + ss2);
+    //                        Log.e("66666", "ss1 SsRsrp:\t " + ss1);
+    //                        Log.e("66666", "SsSinr:\t " + cellSignalStrengthNr.getSsSinr());
+    //                        Toast.makeText(MainActivity.this, "Nr5g"+ ss1, Toast.LENGTH_SHORT).show();
+                            type="Nr";
+                            if(ss1>-128 && ss1<0) {
+                                Nrdbm1s = Nrdbm1s + ss1;
+                                if(ss2>-128 && ss2<0)   Nrdbm2s = Nrdbm2s + ss2;
+                                if(ss3>-128 && ss3<0)   Nrdbm3s = Nrdbm3s + ss3;
+                                if(ss4>0 && ss4<100)    Nrdbm4s = Nrdbm4s + ss4;
+                                Nrcounter++;
+//                                Log.e("66666", "ss2 :\t " + ss2);
+                                Log.e("66666", "dbm2s :\t " + Nrdbm2s/Nrcounter);
+                            }
+                            Log.e("66666", "ss1 dbm\t " + ss1 );
+                            Log.e("66666", "ss2 dbm\t " + ss2 );
+
+//                           Toast.makeText(MainActivity.this, "NR5g"+ ss1, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+//                Log.e("66666", "Nrcounter \t " + Nrcounter );
+//                Log.e("66666", "Ltecounter \t " + Ltecounter );
+                    if(Nrcounter!=0 && type == "Nr"){
+                        dbm1 = Nrdbm1s / Nrcounter;
+                        dbm2 = Nrdbm2s / Nrcounter;
+                        dbm3 = Nrdbm3s / Nrcounter;
+                        dbm4 = Nrdbm4s / Nrcounter;
+    //                    Log.e("66666", "Nrcounter :\t " + Nrcounter);
+                    }
+                    else if(Ltecounter!=0 && type == "Lte") {
+                        dbm1 = dbm1s / Ltecounter;
+                        dbm2 = dbm2s / Ltecounter;
+                        dbm3 = dbm3s / Ltecounter;
+                        dbm4 = dbm4s / Ltecounter;
+                    }
+                    else if(counter!=0){
+                        dbm1 = dbm1s / counter;
+                        dbm2 = dbm2s / counter;
+                        dbm3 = dbm3s / counter;
+                        dbm4 = dbm4s / counter;
+                    }
+
+                }
             }
         };
 
@@ -460,7 +470,7 @@ public class MainActivity extends AppCompatActivity {
     private void showtext() {
             try {
                 if (mode) {
-                    message = String.valueOf(dbm1);
+                    message = String.format("%.2f", dbm1);
                     if(type == "Nr")
                         if (BLE) sendView.setText("蓝牙已连接 Nr_SsRsrp:" + message + "dBm" + "\n");
                         else sendView.setText("蓝牙未连接 Nr_SsRsrp:" + message + "dBm" + "\n");
@@ -495,18 +505,18 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (mode) {
                     if(type == "Nr") {
-                        infoButton1.setText("SsRsrp:" + String.valueOf(dbm1));
-                        infoButton2.setText("SsRsrq:" + String.valueOf(dbm2));
-                        if (dbm3!=0)  infoButton3.setText("CsiRsrp:" + String.valueOf(dbm3));
+                        infoButton1.setText("SsRsrp:\n" + String.format("%.2f",dbm1));
+                        infoButton2.setText("SsRsrq:\n" + String.format("%.2f",dbm2));
+                        if (dbm3!=0)  infoButton3.setText("CsiRsrp:\n" + String.format("%.2f",dbm3));
                         else infoButton3.setText("");
-                        if (dbm4!=0)  infoButton4.setText("SsSinr:" + String.valueOf(dbm4));
+                        if (dbm4!=0)  infoButton4.setText("SsSinr:\n" + String.format("%.2f",dbm4));
                         else infoButton4.setText("");
                     }
                     else if(type == "Lte") {
-                        infoButton1.setText("Rssi:" + String.valueOf(dbm1));
-                        infoButton2.setText("Rsrp:" + String.valueOf(dbm2));
-                        infoButton3.setText("Rsrq:" + String.valueOf(dbm3));
-                        if (dbm4!=0)   infoButton4.setText("Rssnr:" + String.valueOf(dbm4));
+                        infoButton1.setText("Rssi:\n" + String.format("%.2f",dbm1));
+                        infoButton2.setText("Rsrp:\n" + String.format("%.2f",dbm2));
+                        infoButton3.setText("Rsrq:\n" + String.format("%.2f",dbm3));
+                        if (dbm4!=0)   infoButton4.setText("Rssnr:\n" + String.format("%.2f",dbm4));
                         else infoButton4.setText("");
                     }
                     else if (type == "Wcdma") {
@@ -533,7 +543,6 @@ public class MainActivity extends AppCompatActivity {
                         infoButton3.setText("");
                         infoButton4.setText("");
                     }
-
                 } else {
                     infoButton1.setText("Rssi:" + String.valueOf(mywifiinfo.getRssi()));
                     infoButton2.setText("" );
@@ -566,25 +575,13 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             if (mode) {
                                 message = String.valueOf(dbm1);
-//                                if(type == "Nr")
-//                                    sendView.setText("蓝牙已连接 Nr CsiRsrp:" + message + "dBm" + "\n");
-//                                else if(type == "Lte")
-//                                    sendView.setText("蓝牙已连接 Lte Rssi:" + message + "dBm" + "\n");
-//                                else if (type == "Wcdma")
-//                                    sendView.setText("蓝牙已连接 Wcdma:" + message + "dBm" + "\n");
-//                                else if (type == "Cdma")
-//                                    sendView.setText("蓝牙已连接 Cdma:" + message + "dBm" + "\n");
-//                                else if (type == "Gsm")
-//                                    sendView.setText("蓝牙已连接 Gsm:" + message + "dBm" + "\n");
                             }
                             else {
                                 message = String.valueOf(mywifiinfo.getRssi());
-//                                sendView.setText("蓝牙已连接 WiFi_RSSI:" + message + "dBm" + "\n");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        //Log.e(TAG,"send:"+message);
                         myCharateristic.setValue(message);
                         myBluetoothGatt.writeCharacteristic(myCharateristic);
                         myBluetoothGatt.setCharacteristicNotification(myCharateristic, true);
@@ -598,7 +595,6 @@ public class MainActivity extends AppCompatActivity {
     } //蓝牙信息发送
 
     void initView() throws UnsupportedEncodingException {
-
         //search button initial
         searchButton = findViewById(R.id.search_button);
         searchButton.setText("搜索");
@@ -647,7 +643,7 @@ public class MainActivity extends AppCompatActivity {
     private void showSearchList() {
 //        scanning = false;
 //        myBluetoothLeScanner.stopScan(leScanCallback);
-//        leDeviceListAdapter.clear();
+        leDeviceListAdapter.clear();
 //        scanning = true;
 //        myBluetoothLeScanner.startScan(leScanCallback);
         scanLeDevice();
@@ -794,7 +790,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getAxisPoints() {
         for (int i = 0; i < signal.length; i++) {
-            mPointValues.add(new PointValue(i, signal[i]));
+            mPointValues.add(new PointValue(i, (int)signal[i]));
         }
     }   //图表的每个点的显示
 
@@ -865,7 +861,6 @@ public class MainActivity extends AppCompatActivity {
     private void chartchange(int tp){ charttype = tp; }//曲线图切换
 
     private void refresh(){
-
         TimerTask myTimerTask = new TimerTask() {
             @Override
             public void run() {
@@ -920,7 +915,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         lineChart = (LineChartView)findViewById(R.id.line_chart);
-//        clearline();
         getAxisXLables();//获取x轴的标注
 //        getAxisPoints();//获取坐标点
 //        initLineChart();//初始化
@@ -938,9 +932,7 @@ public class MainActivity extends AppCompatActivity {
         initBluetooth();
         initUUID();
         initWiFi_Mobile();
-
         scanLeDevice();
-
     }
 
 }
