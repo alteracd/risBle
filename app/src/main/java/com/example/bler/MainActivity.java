@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 //    private String  mobileNetworkSignal= "";
     private String  type= ""; //流量类型
     private boolean flag = false; //发送
-    private boolean BLE_flag = false; //BLE信息
+//    private boolean BLE_flag = false; //BLE信息
     private boolean BLE = false; //BLE连接
     private boolean mode = true; //网络类型 true 流量
     private int charttype = 1;
@@ -223,6 +223,11 @@ public class MainActivity extends AppCompatActivity {
             int dbm2s = 0;
             int dbm3s = 0;
             int dbm4s = 0;
+            int Nrdbm1s = 0;
+            int Nrdbm2s = 0;
+            int Nrdbm3s = 0;
+            int Nrdbm4s = 0;
+            int Nrcounter = 0;
 
             if (null != cellInfoList)
             {
@@ -234,15 +239,15 @@ public class MainActivity extends AppCompatActivity {
                         ss1 = cellSignalStrengthGsm.getDbm();
                         type="Gsm";
                         //Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
-                        Log.e("66666", "gsm dbm\t " + ss1 );
+//                        Log.e("66666", "gsm dbm\t " + ss1 );
                     }
                     else if (cellInfo instanceof CellInfoCdma)
                     {
                         CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma)cellInfo).getCellSignalStrength();
                         ss1 = cellSignalStrengthCdma.getDbm();
                         type="Cdma";
-                        //Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
-                        Log.e("66666", "cdma dbm\t " + ss1 );
+//                        Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
+//                        Log.e("66666", "cdma dbm\t " + ss1 );
                     }
                     else if (cellInfo instanceof CellInfoWcdma)
                     {
@@ -252,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
                             ss1 = cellSignalStrengthWcdma.getDbm();
                             type="Wcdma";
                             //Log.e("66666", "cellSignalStrengthWcdma" + cellSignalStrengthWcdma.toString() );
-                            Log.e("66666", "wcdma dbm\t " + ss1 );
+//                            Log.e("66666", "wcdma dbm\t " + ss1 );
                         }
                     }
                     else if (cellInfo instanceof CellInfoLte)
@@ -262,38 +267,75 @@ public class MainActivity extends AppCompatActivity {
                         ss2=cellSignalStrengthLte.getRsrp();
                         ss3=cellSignalStrengthLte.getRsrq();
                         ss4=cellSignalStrengthLte.getRssnr();
+//                        Log.e("66666", "Rssinr:\t " + cellSignalStrengthLte.getRssnr());
 //                        Log.e("66666", "\t " + ss4);
                         type="Lte";
 //                        Toast.makeText(MainActivity.this, "Lte4g"+ ss1, Toast.LENGTH_SHORT).show();
+                        if(ss1>-128 && ss1<0) {
+                            dbm1s = dbm1s + ss1;
+                            if(ss2>-128 && ss2<0)   dbm2s = dbm2s + ss2;
+                            if(ss3>-128 && ss3<0)   dbm3s = dbm3s + ss3;
+                            if(ss4>0 && ss4<100)    dbm4s = dbm4s + ss4;
+                            counter++;
+                        }
 //                       Log.e("66666", "LTE dbm\t " + ss );
                     }
                     else if (cellInfo instanceof CellInfoNr)
                     {
                         CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr)cellInfo).getCellSignalStrength();
-                        ss1=cellSignalStrengthNr.getCsiRsrp();
-                        ss2=cellSignalStrengthNr.getCsiRsrq();
-                        ss3=cellSignalStrengthNr.getSsRsrp();
-                        ss4=cellSignalStrengthNr.getCsiSinr();
-//                        Log.e("66666", "\t " + ss4);
+//                        ss1=cellSignalStrengthNr.getCsiRsrp();
+//                        ss2=cellSignalStrengthNr.getCsiRsrq();
+//                        ss3=cellSignalStrengthNr.getSsRsrp();
+//                        ss4=cellSignalStrengthNr.getSsSinr();
+                        ss1=-1*cellSignalStrengthNr.getSsRsrp();
+                        ss2=-1*cellSignalStrengthNr.getSsRsrq();
+                        ss3=cellSignalStrengthNr.getCsiRsrp();
+                        ss4=cellSignalStrengthNr.getSsSinr();
+//                        Log.e("66666", "CsiRsrp:\t " + cellSignalStrengthNr.getCsiRsrp());
+//                        Log.e("66666", "CsiRsrq:\t " + cellSignalStrengthNr.getCsiRsrq());
+//                        Log.e("66666", "Ss2 SsRsrq:\t " + ss2);
+//                        Log.e("66666", "ss1 SsRsrp:\t " + ss1);
+//                        Log.e("66666", "SsSinr:\t " + cellSignalStrengthNr.getSsSinr());
                         type="Nr";
+//                        Toast.makeText(MainActivity.this, "Nr5g"+ ss1, Toast.LENGTH_SHORT).show();
+                        if(ss1>-128 && ss1<0) {
+                            Nrdbm1s = Nrdbm1s + ss1;
+                            if(ss2>-128 && ss2<0)   Nrdbm2s = Nrdbm2s + ss2;
+                            if(ss3>-128 && ss3<0)   Nrdbm3s = Nrdbm3s + ss3;
+                            if(ss4>0 && ss4<100)    Nrdbm4s = Nrdbm4s + ss4;
+                            Nrcounter++;
+                            Log.e("66666", "ss2 :\t " + ss2);
+                            Log.e("66666", "dbm2s :\t " + Nrdbm2s/counter);
+                        }
 //                      Log.e("66666", "NR dbm\t " + ss );
 //                        Toast.makeText(MainActivity.this, "NR5g"+ ss1, Toast.LENGTH_SHORT).show();
                     }
-                    if(ss1>-128 && ss1<0) {
-                        dbm1s = dbm1s + ss1;
-                        if(ss2>-128 && ss2<0)   dbm2s = dbm2s + ss2;
-                        if(ss3>-128 && ss3<0)   dbm3s = dbm3s + ss3;
-                        if(ss4>0 && ss4<100)    dbm4s = dbm4s + ss4;
-                        counter++;
-                    }
+//                    if(ss1>-128 && ss1<0) {
+//                        dbm1s = dbm1s + ss1;
+//                        if(ss2>-128 && ss2<0)   dbm2s = dbm2s + ss2;
+//                        if(ss3>-128 && ss3<0)   dbm3s = dbm3s + ss3;
+//                        if(ss4>0 && ss4<100)    dbm4s = dbm4s + ss4;
+//                        counter++;
+//                        Log.e("66666", "ss2 :\t " + ss2);
+//                        Log.e("66666", "dbm2s :\t " + dbm2s/counter);
+//                    }
                 }
             }
 //            Log.e("66666", "size\t " + counter );
             if(counter!=0) {
-                dbm1 = dbm1s / counter;
-                dbm2 = dbm2s / counter;
-                dbm3 = dbm3s / counter;
-                dbm4 = dbm4s / counter;
+                if(type == "Nr"){
+                    dbm1 = Nrdbm1s / Nrcounter;
+                    dbm2 = Nrdbm2s / Nrcounter;
+                    dbm3 = Nrdbm3s / Nrcounter;
+                    dbm4 = Nrdbm4s / Nrcounter;
+                    Log.e("66666", "Nrcounter :\t " + Nrcounter);
+                }
+                else {
+                    dbm1 = dbm1s / counter;
+                    dbm2 = dbm2s / counter;
+                    dbm3 = dbm3s / counter;
+                    dbm4 = dbm4s / counter;
+                }
 
             }
         }
@@ -416,12 +458,12 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     private void showtext() {
-        if(!flag&&!BLE_flag) {
+        if(!flag) {
             try {
                 if (mode) {
                     message = String.valueOf(dbm1);
                     if(type == "Nr")
-                        sendView.setText("蓝牙未连接 Nr_CsiRsrp:" + message + "dBm" + "\n");
+                        sendView.setText("蓝牙未连接 Nr_SsRsrp:" + message + "dBm" + "\n");
                     else if(type == "Lte")
                         sendView.setText("蓝牙未连接 Lte_Rssi:" + message + "dBm" + "\n");
                     else if (type == "Wcdma")
@@ -448,18 +490,19 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (mode) {
                     if(type == "Nr") {
-                        infoButton1.setText("CsiRsrp:" + String.valueOf(dbm1));
-                        infoButton2.setText("CsiRsrq:" + String.valueOf(dbm2));
-                        infoButton3.setText("SsRsrp:" + String.valueOf(dbm3));
-                        if (dbm4!=0)
-                        infoButton4.setText("CsiSinr:" + String.valueOf(dbm4));
+                        infoButton1.setText("SsRsrp:" + String.valueOf(dbm1));
+                        infoButton2.setText("SsRsrq:" + String.valueOf(dbm2));
+                        if (dbm3!=0)  infoButton3.setText("CsiRsrp:" + String.valueOf(dbm3));
+                        else infoButton3.setText("");
+                        if (dbm4!=0)  infoButton4.setText("SsSinr:" + String.valueOf(dbm4));
+                        else infoButton4.setText("");
                     }
                     else if(type == "Lte") {
                         infoButton1.setText("Rssi:" + String.valueOf(dbm1));
                         infoButton2.setText("Rsrp:" + String.valueOf(dbm2));
                         infoButton3.setText("Rsrq:" + String.valueOf(dbm3));
-                        if (dbm4!=0)
-                        infoButton4.setText("Rssnr:" + String.valueOf(dbm4));
+                        if (dbm4!=0)   infoButton4.setText("Rssnr:" + String.valueOf(dbm4));
+                        else infoButton4.setText("");
                     }
                     else if (type == "Wcdma") {
                         infoButton1.setText("");
@@ -503,7 +546,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         flag=!flag;
-        BLE_flag=false;
         if(flag) {
             sendButton.setText("停止发送");
         }
@@ -519,20 +561,20 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             if (mode) {
                                 message = String.valueOf(dbm1);
-                                if(type == "Nr")
-                                    sendView.setText("蓝牙已连接 Nr CsiRsrp:" + message + "dBm" + "\n");
-                                else if(type == "Lte")
-                                    sendView.setText("蓝牙已连接 Lte Rssi:" + message + "dBm" + "\n");
-                                else if (type == "Wcdma")
-                                    sendView.setText("蓝牙已连接 Wcdma:" + message + "dBm" + "\n");
-                                else if (type == "Cdma")
-                                    sendView.setText("蓝牙已连接 Cdma:" + message + "dBm" + "\n");
-                                else if (type == "Gsm")
-                                    sendView.setText("蓝牙已连接 Gsm:" + message + "dBm" + "\n");
+//                                if(type == "Nr")
+//                                    sendView.setText("蓝牙已连接 Nr CsiRsrp:" + message + "dBm" + "\n");
+//                                else if(type == "Lte")
+//                                    sendView.setText("蓝牙已连接 Lte Rssi:" + message + "dBm" + "\n");
+//                                else if (type == "Wcdma")
+//                                    sendView.setText("蓝牙已连接 Wcdma:" + message + "dBm" + "\n");
+//                                else if (type == "Cdma")
+//                                    sendView.setText("蓝牙已连接 Cdma:" + message + "dBm" + "\n");
+//                                else if (type == "Gsm")
+//                                    sendView.setText("蓝牙已连接 Gsm:" + message + "dBm" + "\n");
                             }
                             else {
                                 message = String.valueOf(mywifiinfo.getRssi());
-                                sendView.setText("蓝牙已连接 WiFi_RSSI:" + message + "dBm" + "\n");
+//                                sendView.setText("蓝牙已连接 WiFi_RSSI:" + message + "dBm" + "\n");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -636,27 +678,27 @@ public class MainActivity extends AppCompatActivity {
                     //Toast.makeText(MainActivity.this, "连接成功连接成功" ,Toast.LENGTH_SHORT).show();
                     //Looper.loop();
                     gatt.discoverServices();// search service
-                    BLE_flag=true;
+//                    BLE_flag=true;
                     BLE = true;
                     sendView.setText("已连接:"+selectedDevice.getName());
                     Log.e(TAG, "onConnectionStateChange 查找成功");
 
                 } else if (newState == BluetoothProfile.STATE_CONNECTING) {
                     Log.e(TAG, "onConnectionStateChange 连接中......");
-                    BLE_flag=true;
+//                    BLE_flag=true;
                     BLE = false;
                     sendView.setText(selectedDevice.getName()+"连接中......");
 
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     Log.e(TAG, "onConnectionStateChange 连接断开");
-                    BLE_flag=true;
+//                    BLE_flag=true;
                     BLE = false;
                     sendView.setText(selectedDevice.getName()+"连接断开");
                     myBluetoothGatt.close();
 
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTING) {
                     Log.e(TAG, "onConnectionStateChange 连接断开中......");
-                    BLE_flag=true;
+//                    BLE_flag=true;
                     BLE = false;
                     sendView.setText(selectedDevice.getName()+"连接断开");
                 }
@@ -798,7 +840,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else if(charttype==2){
             v.bottom = -120;
-            v.top = -10;
+            v.top = 0;
         }
         else if(charttype==3){
             v.bottom = -60;
@@ -895,4 +937,5 @@ public class MainActivity extends AppCompatActivity {
         scanLeDevice();
 
     }
+
 }
