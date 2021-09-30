@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean flag = false; //发送
 //    private boolean BLE_flag = false; //BLE信息
     private boolean BLE = false; //BLE连接
+    private String  BLEstateinfo= ""; //流量类型
     private boolean mode = true; //网络类型 true 流量
     private int charttype = 1;
 
@@ -322,10 +323,10 @@ public class MainActivity extends AppCompatActivity {
                                 if(ss4>0 && ss4<100)    Nrdbm4s = Nrdbm4s + ss4;
                                 Nrcounter++;
 //                                Log.e("66666", "ss2 :\t " + ss2);
-                                Log.e("66666", "dbm2s :\t " + Nrdbm2s/Nrcounter);
+//                                Log.e("66666", "dbm2s :\t " + Nrdbm2s/Nrcounter);
                             }
-                            Log.e("66666", "ss1 dbm\t " + ss1 );
-                            Log.e("66666", "ss2 dbm\t " + ss2 );
+//                            Log.e("66666", "ss1 dbm\t " + ss1 );
+//                            Log.e("66666", "ss2 dbm\t " + ss2 );
 
 //                           Toast.makeText(MainActivity.this, "NR5g"+ ss1, Toast.LENGTH_SHORT).show();
                         }
@@ -474,25 +475,38 @@ public class MainActivity extends AppCompatActivity {
     private void showtext() {
             try {
                 if (mode) {
-                    message = String.format("%.2f", dbm1);
-                    if(type == "Nr")
-                        if (BLE) sendView.setText("蓝牙已连接 Nr_SsRsrp:" + message + "dBm" + "\n");
-                        else sendView.setText("蓝牙未连接 Nr_SsRsrp:" + message + "dBm" + "\n");
-                    else if(type == "Lte")
-                        if (BLE) sendView.setText("蓝牙已连接 Lte_Rssi:" + message + "dBm" + "\n");
-                        else sendView.setText("蓝牙未连接 Lte_Rssi:" + message + "dBm" + "\n");
+                    if (BLE)
+                        BLEstateinfo="蓝牙已连接";
+                    else
+                        BLEstateinfo="蓝牙未连接";
+                    if(type == "Nr") {
+                        if (charttype == 1)
+                            sendView.setText(BLEstateinfo +"Nr_SsRsrp:" + String.format("%.2f", dbm1) + "dBm" + "\n");
+                        else if (charttype == 2)
+                            sendView.setText(BLEstateinfo +"Nr_SsRsrq:" + String.format("%.2f", dbm2) + "dBm" + "\n");
+                        else if (charttype == 3)
+                            sendView.setText(BLEstateinfo +"Nr_CsiRsrp:" + String.format("%.2f", dbm3) + "dBm" + "\n");
+                        else if (charttype == 4)
+                            sendView.setText(BLEstateinfo +"Nr_SsSinr:" + String.format("%.2f", dbm4) + "dBm" + "\n");
+                    }
+                    else if(type == "Lte") {
+                        if (charttype == 1)
+                            sendView.setText(BLEstateinfo +"Lte_Rssi:" + String.format("%.2f", dbm1) + "dBm" + "\n");
+                        else if (charttype == 2)
+                            sendView.setText(BLEstateinfo +"Lte_Rsrq:" + String.format("%.2f", dbm2) + "dBm" + "\n");
+                        else if (charttype == 3)
+                            sendView.setText(BLEstateinfo +"Lte_Rsrp:" + String.format("%.2f", dbm3) + "dBm" + "\n");
+                        else if (charttype == 4)
+                            sendView.setText(BLEstateinfo +"Lte_Rssnr:" + String.format("%.2f", dbm4) + "dBm" + "\n");
+                    }
                     else if (type == "Wcdma")
-                        if (BLE) sendView.setText("蓝牙已连接 Wcdma_signal:" + message + "dBm" + "\n");
-                        else sendView.setText("蓝牙未连接 Wcdma_signal:" + message + "dBm" + "\n");
+                        sendView.setText(BLEstateinfo +"Wcdma_signal:" + String.format("%.2f", dbm1) + "dBm" + "\n");
                     else if (type == "Cdma")
-                        if (BLE) sendView.setText("蓝牙已连接 Cdma_signal:" + message + "dBm" + "\n");
-                        else sendView.setText("蓝牙未连接 Cdma_signal:" + message + "dBm" + "\n");
+                        sendView.setText(BLEstateinfo +"Cdma_signal:" + String.format("%.2f", dbm1) + "dBm" + "\n");
                     else if (type == "Gsm")
-                        if (BLE) sendView.setText("蓝牙已连接 Gsm_signal:" + message + "dBm" + "\n");
-                        else sendView.setText("蓝牙未连接 Gsm_signal:" + message + "dBm" + "\n");
+                        sendView.setText(BLEstateinfo +" Gsm_signal:" + String.format("%.2f", dbm1) + "dBm" + "\n");
                     else{
-                        if (BLE) sendView.setText("蓝牙已连接 无信号");
-                        else sendView.setText("蓝牙未连接 无信号");
+                        sendView.setText("蓝牙已连接 无信号");
                     }
                 } else {
                     message = String.valueOf(mywifiinfo.getRssi());
@@ -578,10 +592,18 @@ public class MainActivity extends AppCompatActivity {
                     if (flag) {
                         try {
                             if (mode) {
-                                message = String.valueOf(dbm1);
+                                if (charttype==1)
+                                    message = String.format("%d",(int)dbm1*100);
+                                else if(charttype==2)
+                                    message = String.format("%d",(int)dbm2*100);
+                                else if(charttype==3)
+                                    message = String.format("%d",(int)dbm3*100);
+                                else if(charttype==4)
+                                    message = String.format("%d",(int)dbm4*100);
+//                                Log.e("66666", "message \t " + message );
                             }
                             else {
-                                message = String.valueOf(mywifiinfo.getRssi());
+                                message = String.format("%d",mywifiinfo.getRssi()*100);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -774,10 +796,16 @@ public class MainActivity extends AppCompatActivity {
     }//启动信号强度获取定时器
 
     private void initUUID() {
+//        HC08
+//        UUID_SERVER = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
+//        UUID_CHAR_READ = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
+//        UUID_CHAR_WRITE = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
 
-        UUID_SERVER = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
-        UUID_CHAR_READ = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
-        UUID_CHAR_WRITE = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
+        //ATK BLE01
+        UUID_SERVER = UUID.fromString("d973f2e0-b19e-11e2-9e96-080020f29a66");
+        UUID_CHAR_READ = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
+        UUID_CHAR_WRITE = UUID.fromString("d973f2e2-b19e-11e2-9e96-0800200c9a66");
+//      UUID_SERVER = UUID.fromString("d973f2e1-b19e-11e2-9e96-9e08000c9a66");
 
         /*
         UUID_SERVER = UUID.fromString("6e400001-b5a3-f393-e0A9-e50e24dcca9e");
@@ -790,7 +818,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < timeline.length; i++) {
             mAxisXValues.add(new AxisValue(i).setLabel(timeline[i]));
         }
-    }//设置X 轴的显示
+    }//设置X轴的显示
 
     private void getAxisPoints() {
         for (int i = 0; i < signal.length; i++) {
@@ -861,6 +889,7 @@ public class MainActivity extends AppCompatActivity {
         lineChart.setCurrentViewport(v);
 
     } //设置并显示图表
+
     private void initialsignals(){
         for(int i=0;i<30;i++){
             signal1[i]=-130;
@@ -869,6 +898,7 @@ public class MainActivity extends AppCompatActivity {
             signal4[i]=-20;
         }
     }
+
     private void chartchange(int tp){ charttype = tp; }//曲线图切换
 
     private void refresh(){
