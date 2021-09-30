@@ -22,6 +22,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -50,9 +51,11 @@ import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 //import android.widget.EditText;
@@ -633,11 +636,20 @@ public class MainActivity extends AppCompatActivity {
     }//蓝牙发送任务设定
 
     private void setfreq(){
-        freq= Integer.parseInt(freq_edit.getText().toString());
-        BLEsendTimerTask.cancel();
-        myBLETimer.purge();
-        flag=false;
-        sendButton.setText("启动发送");
+        try {
+            freq= Integer.parseInt(freq_edit.getText().toString());
+            Toast.makeText(MainActivity.this, "设定成功" , Toast.LENGTH_SHORT).show();
+        }catch(Exception ex){
+            ex.printStackTrace();
+            Toast.makeText(MainActivity.this, "请输入正确数值" , Toast.LENGTH_SHORT).show();
+        }
+        if(BLE&&flag) {
+            BLEsendTimerTask.cancel();
+            myBLETimer.purge();
+            flag = false;
+            sendButton.setText("启动发送");
+        }
+
     }//蓝牙发送频率设定
 
     void initView() throws UnsupportedEncodingException {
@@ -654,15 +666,29 @@ public class MainActivity extends AppCompatActivity {
     } //蓝牙列表初始化等等
 
     void initUI() throws UnsupportedEncodingException{
+
+        Resources resources = this.getResources();
+        DisplayMetrics dm = resources.getDisplayMetrics();
+        int width = dm.widthPixels;
+        Log.e("66666", "wd \t " + width );
+
         //search button initial
         searchButton = findViewById(R.id.search_button);
         searchButton.setText("搜索");
         searchButton.setOnClickListener(v -> showSearchList());
+        ViewGroup.LayoutParams BtnPara = searchButton.getLayoutParams();
+        BtnPara.width = width/2 - 15;
+        searchButton.setLayoutParams(BtnPara);
+//        searchButton.setWidth(width/2 - 4);
 
         //send button initial
         sendButton = findViewById(R.id.send_button);
         sendButton.setText("启动发送");
         sendButton.setOnClickListener(v -> sendMessage());
+        BtnPara = sendButton.getLayoutParams();
+        BtnPara.width = width/2 - 15;
+        sendButton.setLayoutParams(BtnPara);
+//        sendButton.setWidth(width/2 - 4);
 
         //text box init
         sendView = findViewById(R.id.send_view);
@@ -671,26 +697,39 @@ public class MainActivity extends AppCompatActivity {
         modeButton = findViewById(R.id.mode_button);
         modeButton.setText("类型：移动网络");
         modeButton.setOnClickListener(v -> modechange());
+        BtnPara = modeButton.getLayoutParams();
+        BtnPara.width = width/2 - 15;
+        modeButton.setLayoutParams(BtnPara);
+//        modeButton.setWidth(width/2 - 4);
 
         //  info  init
         infoButton1 = findViewById(R.id.info_button1);
         infoButton1.setText("");
         infoButton1.setOnClickListener(v -> chartchange(1));
+        infoButton1.setWidth(width/4 - 5);
         infoButton2 = findViewById(R.id.info_button2);
         infoButton2.setText("");
         infoButton2.setOnClickListener(v -> chartchange(2));
+        infoButton2.setWidth(width/4 - 5);
         infoButton3 = findViewById(R.id.info_button3);
         infoButton3.setText("");
         infoButton3.setOnClickListener(v -> chartchange(3));
+        infoButton3.setWidth(width/4 - 4);
         infoButton4= findViewById(R.id.info_button4);
         infoButton4.setText("");
         infoButton4.setOnClickListener(v -> chartchange(4));
+        infoButton4.setWidth(width/4 - 4);
 
         freq_set=findViewById(R.id.freq_button);
         freq_set.setText("设定");
         freq_set.setOnClickListener(v -> setfreq());
 
         freq_edit=(EditText)findViewById(R.id.edit_freq);
+        ViewGroup.LayoutParams setbtnPara = freq_set.getLayoutParams();
+        BtnPara = freq_edit.getLayoutParams();
+        BtnPara.width = width/2 -40 -setbtnPara.width ;
+        freq_edit.setLayoutParams(BtnPara);
+//        freq_edit.setWidth(width/4 + 4);
     } //UI控件初始化
 
     private void showSearchList() {
@@ -700,7 +739,10 @@ public class MainActivity extends AppCompatActivity {
 //        scanning = true;
 //        myBluetoothLeScanner.startScan(leScanCallback);
         scanLeDevice();
+//        leDeviceListAdapter.notifyDataSetChanged();
         searchList.setAdapter(leDeviceListAdapter);
+//        searchList.invalidate();
+//        searchList.postInvalidate();
     }//蓝牙列表
 
     private void initBluetooth() {
@@ -989,7 +1031,6 @@ public class MainActivity extends AppCompatActivity {
         initialsignals();
         refresh();
 
-
         getBlePermissionFromSys();
         //checkPermissions();
 
@@ -999,14 +1040,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
         initBluetooth();
         initUUID();
         initWiFi_Mobile();
         scanLeDevice();
-
-//        blesend();
-
     }
 
 }

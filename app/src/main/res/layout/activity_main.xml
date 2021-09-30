@@ -91,7 +91,7 @@
             android:layout_marginLeft="2dp"
             android:layout_toRightOf="@+id/view1"
             android:ems="19"
-            android:hint="发送速度(ms/次)"
+            android:hint="发送间隔(ms/次)"
             android:inputType="numberDecimal"
             android:padding="1dp"
             android:textSize="10sp">
