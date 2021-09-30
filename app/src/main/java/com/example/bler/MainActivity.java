@@ -56,6 +56,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 //import android.widget.EditText;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -90,9 +91,11 @@ public class MainActivity extends AppCompatActivity {
     private Button infoButton2;
     private Button infoButton4;
     private Button infoButton3;
+    private Button freq_set;
     private ListView searchList;
     private Button sendButton;
     private TextView sendView;
+    private EditText freq_edit;
 
     private double dbm1 = -1;
     private double dbm2 = -1;
@@ -114,6 +117,9 @@ public class MainActivity extends AppCompatActivity {
     private String  BLEstateinfo= ""; //流量类型
     private boolean mode = true; //网络类型 true 流量
     private int charttype = 1;
+    private int freq = 100;
+    private TimerTask BLEsendTimerTask;
+    private Timer myBLETimer = new Timer();
 
     private LineChartView lineChart;
     private double[] signal= new double[30];//图表的数据点
@@ -516,7 +522,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-    }//
+    }//上方textview显示
 
     @SuppressLint("SetTextI18n")
     private void showinfo() {
@@ -579,53 +585,62 @@ public class MainActivity extends AppCompatActivity {
         }
         flag=!flag;
         if(flag) {
+            if (myBluetoothGatt != null ) {
+                blesend();
+                myBLETimer.schedule(BLEsendTimerTask, 0, freq);
+            }
             sendButton.setText("停止发送");
         }
         else{
+            BLEsendTimerTask.cancel();
+            myBLETimer.purge();
             sendButton.setText("启动发送");
         }
-        if (myBluetoothGatt != null ) {
-            TimerTask myTimerTask = new TimerTask() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void run() {
-                    if (flag) {
-                        try {
-                            if (mode) {
-                                if (charttype==1)
-                                    message = String.format("%d",(int)dbm1*100);
-                                else if(charttype==2)
-                                    message = String.format("%d",(int)dbm2*100);
-                                else if(charttype==3)
-                                    message = String.format("%d",(int)dbm3*100);
-                                else if(charttype==4)
-                                    message = String.format("%d",(int)dbm4*100);
-//                                Log.e("66666", "message \t " + message );
-                            }
-                            else {
-                                message = String.format("%d",mywifiinfo.getRssi()*100);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        myCharateristic.setValue(message);
-                        myBluetoothGatt.writeCharacteristic(myCharateristic);
-                        myBluetoothGatt.setCharacteristicNotification(myCharateristic, true);
-                        //+"linkSpeed:"+String.valueOf(mywifiinfo.getTxLinkSpeedMbps())+"Mbps");
-                    }
-                }
-            };
-            Timer myTimer = new Timer();
-            myTimer.schedule(myTimerTask, 0, 100);
-        }
+
     } //蓝牙信息发送
 
-    void initView() throws UnsupportedEncodingException {
-        //search button initial
-        searchButton = findViewById(R.id.search_button);
-        searchButton.setText("搜索");
-        searchButton.setOnClickListener(v -> showSearchList());
+    private void blesend(){
+        BLEsendTimerTask = new TimerTask() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void run() {
+                if (flag) {
+                    try {
+                        if (mode) {
+                            if (charttype==1)
+                                message = String.format("%d",(int)dbm1*100);
+                            else if(charttype==2)
+                                message = String.format("%d",(int)dbm2*100);
+                            else if(charttype==3)
+                                message = String.format("%d",(int)dbm3*100);
+                            else if(charttype==4)
+                                message = String.format("%d",(int)dbm4*100);
+//                                Log.e("66666", "message \t " + message );
+                        }
+                        else {
+                            message = String.format("%d",mywifiinfo.getRssi()*100);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    myCharateristic.setValue(message);
+                    myBluetoothGatt.writeCharacteristic(myCharateristic);
+                    myBluetoothGatt.setCharacteristicNotification(myCharateristic, true);
+                    //+"linkSpeed:"+String.valueOf(mywifiinfo.getTxLinkSpeedMbps())+"Mbps");
+                }
+            }
+        };
+    }//蓝牙发送任务设定
 
+    private void setfreq(){
+        freq= Integer.parseInt(freq_edit.getText().toString());
+        BLEsendTimerTask.cancel();
+        myBLETimer.purge();
+        flag=false;
+        sendButton.setText("启动发送");
+    }//蓝牙发送频率设定
+
+    void initView() throws UnsupportedEncodingException {
         //BLE list initial
         searchList = findViewById(R.id.search_list);
         searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -636,6 +651,13 @@ public class MainActivity extends AppCompatActivity {
                 myBluetoothGatt = selectedDevice.connectGatt(MainActivity.this, false, bluetoothGattCallback, BluetoothDevice.TRANSPORT_LE);
             }
         });
+    } //蓝牙列表初始化等等
+
+    void initUI() throws UnsupportedEncodingException{
+        //search button initial
+        searchButton = findViewById(R.id.search_button);
+        searchButton.setText("搜索");
+        searchButton.setOnClickListener(v -> showSearchList());
 
         //send button initial
         sendButton = findViewById(R.id.send_button);
@@ -664,7 +686,12 @@ public class MainActivity extends AppCompatActivity {
         infoButton4.setText("");
         infoButton4.setOnClickListener(v -> chartchange(4));
 
-    } //蓝牙列表 按键初始化
+        freq_set=findViewById(R.id.freq_button);
+        freq_set.setText("设定");
+        freq_set.setOnClickListener(v -> setfreq());
+
+        freq_edit=(EditText)findViewById(R.id.edit_freq);
+    } //UI控件初始化
 
     private void showSearchList() {
 //        scanning = false;
@@ -812,7 +839,7 @@ public class MainActivity extends AppCompatActivity {
         UUID_CHAR_WRITE = UUID.fromString("6e400002-b5a3-f393-e0A9-e50e24dcca9e");
         UUID_CHAR_READ = UUID.fromString("6e400003-b5a3-f393-e0A9-e50e24dcca9e");
          */
-    }
+    } //蓝牙服务UUID
 
     private void getAxisXLables() {
         for (int i = 0; i < timeline.length; i++) {
@@ -962,11 +989,13 @@ public class MainActivity extends AppCompatActivity {
         initialsignals();
         refresh();
 
+
         getBlePermissionFromSys();
         //checkPermissions();
 
         try {
             initView();
+            initUI();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -975,6 +1004,9 @@ public class MainActivity extends AppCompatActivity {
         initUUID();
         initWiFi_Mobile();
         scanLeDevice();
+
+//        blesend();
+
     }
 
 }

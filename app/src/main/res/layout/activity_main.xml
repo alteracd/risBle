@@ -60,25 +60,63 @@
         android:layout_width="match_parent"
         android:layout_height="250dp" />
 
-    <Button
-        android:id="@+id/mode_button"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Button" />
+        android:layout_height="45dp"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/mode_button"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:textSize="12.0sp"
+            android:text="Button" />
+        <View
+            android:id="@+id/view1"
+            android:layout_width="1dip"
+            android:layout_height="fill_parent"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_toRightOf="@+id/textView1"
+            android:background="#EEEFFF" />
+
+        <EditText
+            android:id="@+id/edit_freq"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="2dp"
+            android:layout_toRightOf="@+id/view1"
+            android:ems="19"
+            android:hint="发送速度(ms/次)"
+            android:inputType="numberDecimal"
+            android:padding="1dp"
+            android:textSize="10sp">
+        </EditText>
+        <Button
+            android:id="@+id/freq_button"
+            android:layout_width="62dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:textSize="9sp"/>
+    </LinearLayout>
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="45dp"
         android:orientation="horizontal">
-
         <Button
             android:id="@+id/search_button"
             android:layout_width="170dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:layout_marginBottom="3dp" />
+            android:textSize="12.0sp"/>
 
         <Button
             android:id="@+id/send_button"
@@ -86,8 +124,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:layout_marginBottom="3dp" />
-
+            android:textSize="12.0sp"/>
     </LinearLayout>
 
     <ListView
@@ -98,3 +135,5 @@
 
 
 </LinearLayout>
+
+
