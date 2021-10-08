@@ -87,7 +87,7 @@ import lecho.lib.hellocharts.view.LineChartView;
 
 
 public class MainActivity extends AppCompatActivity {
-
+    //UI控件
     private Button searchButton;
     private Button modeButton;
     private Button infoButton1;
@@ -100,30 +100,27 @@ public class MainActivity extends AppCompatActivity {
     private TextView sendView;
     private EditText freq_edit;
 
+    //信号强度
     private double dbm1 = -1;
     private double dbm2 = -1;
     private double dbm3 = -1;
     private double dbm4 = -1;
     private WifiManager mywifiManager;
     private WifiInfo mywifiinfo;
-
-    private String message = "";//发送信息
-//    private String info1 = "";//显示信息1
-//    private String info2 = "";
-//    private String info3 = "";
-//    private String info4 = "";
-//    private String  mobileNetworkSignal= "";
     private String  type= ""; //流量类型
-    private boolean flag = false; //发送
-//    private boolean BLE_flag = false; //BLE信息
-    private boolean BLE = false; //BLE连接
-    private String  BLEstateinfo= ""; //流量类型
-    private boolean mode = true; //网络类型 true 流量
-    private int charttype = 1;
-    private int freq = 100;
-    private TimerTask BLEsendTimerTask;
-    private Timer myBLETimer = new Timer();
 
+    //蓝牙发送相关
+    private String message = "";//发送信息
+    private boolean flag = false; //发送
+    private boolean BLE = false; //BLE连接
+    private String  BLEstateinfo= "";
+    private boolean mode = true; //网络类型 true 流量
+    private int charttype = 1; //图线type
+    private int freq = 100; //发送间隔
+    private TimerTask BLEsendTimerTask; //ble发送定时器任务
+    private Timer myBLETimer = new Timer();//ble发送定时器
+
+    //曲线相关
     private LineChartView lineChart;
     private double[] signal= new double[30];//图表的数据点
     private double[] signal1= new double[30];//图表的数据点
@@ -134,28 +131,24 @@ public class MainActivity extends AppCompatActivity {
     private String[] timeline = {"30s前","29s前","28s前","27s前","26s前","25","24s前","23s前",
             "22s前","21s前","20s前","19s前","18","19","18","15s前","14s前","13s前","12s前",
             "11s前","10s前","9s前","8","7","6s前","5s前","4s前","3s前","2","1"};//X轴的标注
-//    private int[] signal= {74,22,18,79,20,74,20,74,42,90,74,42,90,50,42,90,33,10,74,22,18,79,20,74,22,18,79,20};//图表的数据
     private List<PointValue> mPointValues = new ArrayList<PointValue>();
     private List<AxisValue> mAxisXValues = new ArrayList<AxisValue>();
 
-
+    //蓝牙相关
     public static UUID UUID_SERVER;
     public static UUID UUID_CHAR_READ;
     public static UUID UUID_CHAR_WRITE;
-    public static final String TAG = "BluetoothLeService";
+    public static final String TAG = "BluetoothLeService";//调试tag
     private BluetoothGatt myBluetoothGatt;
     private BluetoothGattCallback bluetoothGattCallback;
-
     private BluetoothGattService myBluetoothService;
     private BluetoothGattCharacteristic myCharateristic;
-
     private BluetoothLeScanner myBluetoothLeScanner;
     private boolean scanning;
     private Handler myHandler;
     private myAdapter leDeviceListAdapter;
     private myAdapter adapterlist;
     private ScanCallback leScanCallback;
-
     private BluetoothAdapter myBluetoothAdapter;
     private BluetoothManager myBluetoothManager;
     private BluetoothDevice selectedDevice;
@@ -194,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
             scanning = false;
             myBluetoothLeScanner.stopScan(leScanCallback);
         }
-    }
+    }//蓝牙扫描
 
     private void clearline(){
         for(int i=0;i<30;i++) {
@@ -576,6 +569,8 @@ public class MainActivity extends AppCompatActivity {
                     infoButton3.setText("");
                     infoButton4.setText("");
                 }
+//                message = "@"+String.format("%5s",mywifiinfo.getRssi()*(-10)).replaceAll(" ", "0")+"#";
+//                Log.e("66666", "message\t " + message);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -610,18 +605,19 @@ public class MainActivity extends AppCompatActivity {
                 if (flag) {
                     try {
                         if (mode) {
+//                            number = ("000000"+number).slice(-pos)
                             if (charttype==1)
-                                message = String.format("%d",(int)dbm1*100);
+                                message = "@"+String.format("%5s",(int)dbm1*(-100)).replaceAll(" ", "0")+"#";
                             else if(charttype==2)
-                                message = String.format("%d",(int)dbm2*100);
+                                message = "@"+String.format("%d",(int)dbm2*(-100)).replaceAll(" ", "0")+"#";
                             else if(charttype==3)
-                                message = String.format("%d",(int)dbm3*100);
+                                message = "@"+String.format("%d",(int)dbm3*(-100)).replaceAll(" ", "0")+"#";
                             else if(charttype==4)
-                                message = String.format("%d",(int)dbm4*100);
+                                message = "@"+String.format("%d",(int)dbm4*100).replaceAll(" ", "0")+"#";
 //                                Log.e("66666", "message \t " + message );
                         }
                         else {
-                            message = String.format("%d",mywifiinfo.getRssi()*100);
+                            message = "@"+String.format("%5s",mywifiinfo.getRssi()*(-10)).replaceAll(" ", "0")+"#";
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -938,7 +934,7 @@ public class MainActivity extends AppCompatActivity {
         Viewport v = new Viewport(lineChart.getMaximumViewport());
         if (charttype==1){
             v.bottom = -130;
-            v.top = -40;
+            v.top = -30;
         }
         else if(charttype==2){
             v.bottom = -30;
@@ -965,6 +961,7 @@ public class MainActivity extends AppCompatActivity {
             signal2[i]=-30;
             signal3[i]=-130;
             signal4[i]=-20;
+            signalwifi[i]=-130;
         }
     }
 
@@ -983,7 +980,6 @@ public class MainActivity extends AppCompatActivity {
                         signal4[label] = signal4[label + 1];
                     }
                     signalwifi[label] = signalwifi[label + 1];
-
                 }
                 if (type=="Nr"||type=="Lte") {
                     if (dbm4 > -2 && dbm4 < 100)  signal4[29] = dbm4;
@@ -1016,7 +1012,6 @@ public class MainActivity extends AppCompatActivity {
         Timer myTimer = new Timer();
         myTimer.schedule(myTimerTask, 10, 1000);
 
-
     }//曲线图刷新
 
     @Override
@@ -1031,9 +1026,7 @@ public class MainActivity extends AppCompatActivity {
         initialsignals();
         refresh();
 
-        getBlePermissionFromSys();
-        //checkPermissions();
-
+        getBlePermissionFromSys();//checkPermissions();
         try {
             initView();
             initUI();
