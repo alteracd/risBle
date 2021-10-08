@@ -483,30 +483,30 @@ public class MainActivity extends AppCompatActivity {
                         BLEstateinfo="蓝牙未连接";
                     if(type == "Nr") {
                         if (charttype == 1)
-                            sendView.setText(BLEstateinfo +"Nr_SsRsrp:" + String.format("%.2f", dbm1) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo +"Nr_SsRsrp:" + String.format("%.1f", dbm1) + "dBm" + "\n");
                         else if (charttype == 2)
-                            sendView.setText(BLEstateinfo +"Nr_SsRsrq:" + String.format("%.2f", dbm2) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo +"Nr_SsRsrq:" + String.format("%.1f", dbm2) + "dBm" + "\n");
                         else if (charttype == 3)
-                            sendView.setText(BLEstateinfo +"Nr_CsiRsrp:" + String.format("%.2f", dbm3) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo +"Nr_CsiRsrp:" + String.format("%.1f", dbm3) + "dBm" + "\n");
                         else if (charttype == 4)
-                            sendView.setText(BLEstateinfo +"Nr_SsSinr:" + String.format("%.2f", dbm4) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo +"Nr_SsSinr:" + String.format("%.1f", dbm4) + "dBm" + "\n");
                     }
                     else if(type == "Lte") {
                         if (charttype == 1)
-                            sendView.setText(BLEstateinfo +"Lte_Rssi:" + String.format("%.2f", dbm1) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo +"Lte_Rssi:" + String.format("%.1f", dbm1) + "dBm" + "\n");
                         else if (charttype == 2)
-                            sendView.setText(BLEstateinfo +"Lte_Rsrq:" + String.format("%.2f", dbm2) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo +"Lte_Rsrq:" + String.format("%.1f", dbm2) + "dBm" + "\n");
                         else if (charttype == 3)
-                            sendView.setText(BLEstateinfo +"Lte_Rsrp:" + String.format("%.2f", dbm3) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo +"Lte_Rsrp:" + String.format("%.1f", dbm3) + "dBm" + "\n");
                         else if (charttype == 4)
-                            sendView.setText(BLEstateinfo +"Lte_Rssnr:" + String.format("%.2f", dbm4) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo +"Lte_Rssnr:" + String.format("%.1f", dbm4) + "dBm" + "\n");
                     }
                     else if (type == "Wcdma")
-                        sendView.setText(BLEstateinfo +"Wcdma_signal:" + String.format("%.2f", dbm1) + "dBm" + "\n");
+                        sendView.setText(BLEstateinfo +"Wcdma_signal:" + String.format("%.1f", dbm1) + "dBm" + "\n");
                     else if (type == "Cdma")
-                        sendView.setText(BLEstateinfo +"Cdma_signal:" + String.format("%.2f", dbm1) + "dBm" + "\n");
+                        sendView.setText(BLEstateinfo +"Cdma_signal:" + String.format("%.1f", dbm1) + "dBm" + "\n");
                     else if (type == "Gsm")
-                        sendView.setText(BLEstateinfo +" Gsm_signal:" + String.format("%.2f", dbm1) + "dBm" + "\n");
+                        sendView.setText(BLEstateinfo +" Gsm_signal:" + String.format("%.1f", dbm1) + "dBm" + "\n");
                     else{
                         sendView.setText("蓝牙已连接 无信号");
                     }
@@ -607,17 +607,17 @@ public class MainActivity extends AppCompatActivity {
                         if (mode) {
 //                            number = ("000000"+number).slice(-pos)
                             if (charttype==1)
-                                message = "@"+String.format("%5s",(int)dbm1*(-100)).replaceAll(" ", "0")+"#";
+                                message = String.format("%4s",(int)(dbm1*(-10))).replaceAll(" ", "0")+"t";
                             else if(charttype==2)
-                                message = "@"+String.format("%d",(int)dbm2*(-100)).replaceAll(" ", "0")+"#";
+                                message = String.format("%4s",(int)(dbm2*(-10))).replaceAll(" ", "0")+"t";
                             else if(charttype==3)
-                                message = "@"+String.format("%d",(int)dbm3*(-100)).replaceAll(" ", "0")+"#";
+                                message = String.format("%4s",(int)(dbm3*(-10))).replaceAll(" ", "0")+"t";
                             else if(charttype==4)
-                                message = "@"+String.format("%d",(int)dbm4*100).replaceAll(" ", "0")+"#";
+                                message = String.format("%4s",(int)(dbm4*10)).replaceAll(" ", "0")+"t";
 //                                Log.e("66666", "message \t " + message );
                         }
                         else {
-                            message = "@"+String.format("%5s",mywifiinfo.getRssi()*(-10)).replaceAll(" ", "0")+"#";
+                            message = String.format("%4s",mywifiinfo.getRssi()*(-10)).replaceAll(" ", "0")+"t";
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
