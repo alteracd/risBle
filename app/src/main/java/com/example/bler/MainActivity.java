@@ -236,6 +236,14 @@ public class MainActivity extends AppCompatActivity {
                 double Nrdbm3s = 0;
                 double Nrdbm4s = 0;
                 double Nrcounter = 0;
+                double Nrss1=0;
+                double Nrss2=0;
+                double Nrss3=0;
+                double Nrss4=0;
+                double Ltess1=0;
+                double Ltess2=0;
+                double Ltess3=0;
+                double Ltess4=0;
 
                 if (null != cellInfoList)
                 {
@@ -251,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
                                 counter++;
                             }
     //                        Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
-    //                        Log.e("66666", "gsm dbm\t " + ss1 );
+                            Log.e("66666", "gsm dbm\t " + ss1 );
                         }
                         else if (cellInfo instanceof CellInfoCdma)
                         {
@@ -263,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
                                 counter++;
                             }
     //                        Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
-    //                        Log.e("66666", "cdma dbm\t " + ss1 );
+                            Log.e("66666", "cdma dbm\t " + ss1 );
                         }
                         else if (cellInfo instanceof CellInfoWcdma)
                         {
@@ -278,6 +286,7 @@ public class MainActivity extends AppCompatActivity {
                                     dbm1s = dbm1s + ss1;
                                     counter++;
                                 }
+                                Log.e("66666", "WCDMA dbm\t " + ss1 );
                             }
                         }
                         else if (cellInfo instanceof CellInfoLte)
@@ -292,13 +301,18 @@ public class MainActivity extends AppCompatActivity {
     //                        Toast.makeText(MainActivity.this, "Lte4g"+ ss1, Toast.LENGTH_SHORT).show();
                             type="Lte";
                             if(ss1>-128 && ss1<0) {
+                                if(Ltecounter==0){
+                                    Ltess1=ss1;
+                                    Ltess2=ss2;
+                                    Ltess4=ss4;
+                                }
                                 Ltedbm1s = Ltedbm1s + ss1;
                                 if(ss2>-128 && ss2<0)   Ltedbm2s = Ltedbm2s + ss2;
                                 if(ss3>-128 && ss3<0)   Ltedbm3s = Ltedbm3s + ss3;
                                 if(ss4>0 && ss4<100)    Ltedbm4s = Ltedbm4s + ss4;
                                 Ltecounter++;
                             }
-    //                       Log.e("66666", "LTE dbm\t " + ss );
+                           Log.e("66666", "LTE dbm\t " + ss1 );
                         }
                         else if (cellInfo instanceof CellInfoNr)
                         {
@@ -319,11 +333,17 @@ public class MainActivity extends AppCompatActivity {
     //                        Toast.makeText(MainActivity.this, "Nr5g"+ ss1, Toast.LENGTH_SHORT).show();
                             type="Nr";
                             if(ss1>-128 && ss1<0) {
+                                if(Nrcounter==0){
+                                    Nrss1=ss1;
+                                    Nrss2=ss2;
+                                    Nrss4=ss4;
+                                }
                                 Nrdbm1s = Nrdbm1s + ss1;
                                 if(ss2>-128 && ss2<0)   Nrdbm2s = Nrdbm2s + ss2;
                                 if(ss3>-128 && ss3<0)   Nrdbm3s = Nrdbm3s + ss3;
                                 if(ss4>0 && ss4<100)    Nrdbm4s = Nrdbm4s + ss4;
                                 Nrcounter++;
+                                Log.e("66666", "Nrss1 :\t " + ss1);
 //                                Log.e("66666", "ss2 :\t " + ss2);
 //                                Log.e("66666", "dbm2s :\t " + Nrdbm2s/Nrcounter);
                             }
@@ -337,17 +357,29 @@ public class MainActivity extends AppCompatActivity {
 //                Log.e("66666", "Nrcounter \t " + Nrcounter );
 //                Log.e("66666", "Ltecounter \t " + Ltecounter );
                     if(Nrcounter!=0 && type == "Nr"){
-                        dbm1 = Nrdbm1s / Nrcounter;
-                        dbm2 = Nrdbm2s / Nrcounter;
-                        dbm3 = Nrdbm3s / Nrcounter;
-                        dbm4 = Nrdbm4s / Nrcounter;
-    //                    Log.e("66666", "Nrcounter :\t " + Nrcounter);
+//                        if(Nrcounter>1) {
+                            dbm1 = Nrss1;
+                            dbm2 = Nrss2;
+                            dbm3 = Nrss3;
+                            dbm4 = Nrss4;
+//                        }
+//                        else {
+//                            dbm1 = Nrdbm1s / Nrcounter;
+//                            dbm2 = Nrdbm2s / Nrcounter;
+//                            dbm3 = Nrdbm3s / Nrcounter;
+//                            dbm4 = Nrdbm4s / Nrcounter;
+//                        }
+                        Log.e("66666", "Nrcounter :\t " + Nrcounter);
                     }
                     else if(Ltecounter!=0 && type == "Lte") {
-                        dbm1 = Ltedbm1s / Ltecounter;
-                        dbm2 = Ltedbm2s / Ltecounter;
-                        dbm3 = Ltedbm3s / Ltecounter;
-                        dbm4 = Ltedbm4s / Ltecounter;
+//                        dbm1 = Ltedbm1s / Ltecounter;
+//                        dbm2 = Ltedbm2s / Ltecounter;
+//                        dbm3 = Ltedbm3s / Ltecounter;
+//                        dbm4 = Ltedbm4s / Ltecounter;
+                        dbm1 = Ltess1;
+                        dbm2 = Ltess2;
+                        dbm3 = Ltess3;
+                        dbm4 = Ltess4;
                     }
                     else if(counter!=0){
                         dbm1 = dbm1s / counter;
@@ -607,17 +639,17 @@ public class MainActivity extends AppCompatActivity {
                         if (mode) {
 //                            number = ("000000"+number).slice(-pos)
                             if (charttype==1)
-                                message = String.format("%4s",(int)(dbm1*(-10))).replaceAll(" ", "0")+"t";
+                                message = "@"+ String.format("%4s",(int)(dbm1*(-10))).replaceAll(" ", "0")+"#";
                             else if(charttype==2)
-                                message = String.format("%4s",(int)(dbm2*(-10))).replaceAll(" ", "0")+"t";
+                                message = "@"+ String.format("%4s",(int)(dbm2*(-10))).replaceAll(" ", "0")+"#";
                             else if(charttype==3)
-                                message = String.format("%4s",(int)(dbm3*(-10))).replaceAll(" ", "0")+"t";
+                                message = "@"+ String.format("%4s",(int)(dbm3*(-10))).replaceAll(" ", "0")+"#";
                             else if(charttype==4)
-                                message = String.format("%4s",(int)(dbm4*10)).replaceAll(" ", "0")+"t";
+                                message = "@"+ String.format("%4s",(int)(dbm4*10)).replaceAll(" ", "0")+"#";
 //                                Log.e("66666", "message \t " + message );
                         }
                         else {
-                            message = String.format("%4s",mywifiinfo.getRssi()*(-10)).replaceAll(" ", "0")+"t";
+                            message = "@"+ String.format("%4s",mywifiinfo.getRssi()*(-10)).replaceAll(" ", "0")+"#";
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
