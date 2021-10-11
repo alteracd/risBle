@@ -332,6 +332,7 @@ public class MainActivity extends AppCompatActivity {
                             ss4=cellSignalStrengthNr.getSsSinr();
 //                            Log.e("id",((CellInfoNr)cellInfo).getCellIdentity().toString());
                             cid = ((CellInfoNr)cellInfo).getCellIdentity().toString().substring(24,27);
+                            cid=cid.replaceAll(" ","");
 //                            cid= cid.substring(24,27);
 //                            Log.e("cid",cid);
                             cidint=Integer.parseInt(cid);
@@ -552,7 +553,7 @@ public class MainActivity extends AppCompatActivity {
                         if(cidshowflag)
                             cidinfo=" cid198";
                         else
-                            cidinfo=" *6[P198丢失";
+                            cidinfo=" 198丢失";
                         if (charttype == 1)
                             sendView.setText(BLEstateinfo + cidinfo +" Nr_SsRsrp:" + String.format("%.1f", dbm1) + "dBm" + "\n");
                         else if (charttype == 2)

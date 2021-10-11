@@ -13,7 +13,7 @@
         android:layout_height="50dp"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
-        android:textSize="20sp"
+        android:textSize="17sp"
         android:textColor="@color/black"
         android:gravity="center"/>
 
