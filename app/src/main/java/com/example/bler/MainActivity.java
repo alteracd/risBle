@@ -119,6 +119,9 @@ public class MainActivity extends AppCompatActivity {
     private int freq = 100; //发送间隔
     private TimerTask BLEsendTimerTask; //ble发送定时器任务
     private Timer myBLETimer = new Timer();//ble发送定时器
+    private boolean cidflag = false;
+    private boolean cidshowflag = false;
+
 
     //曲线相关
     private LineChartView lineChart;
@@ -244,6 +247,8 @@ public class MainActivity extends AppCompatActivity {
                 double Ltess2=0;
                 double Ltess3=0;
                 double Ltess4=0;
+                String cid="";
+                int cidint=0;
 
                 if (null != cellInfoList)
                 {
@@ -325,6 +330,13 @@ public class MainActivity extends AppCompatActivity {
                             ss2=-1*cellSignalStrengthNr.getSsRsrq();
                             ss3=cellSignalStrengthNr.getCsiRsrp();
                             ss4=cellSignalStrengthNr.getSsSinr();
+//                            Log.e("id",((CellInfoNr)cellInfo).getCellIdentity().toString());
+                            cid = ((CellInfoNr)cellInfo).getCellIdentity().toString().substring(24,27);
+//                            cid= cid.substring(24,27);
+//                            Log.e("cid",cid);
+                            cidint=Integer.parseInt(cid);
+//                            Log.e("cid","cidint:"+String.valueOf(cidint));
+//                            Log.e("66666", "Nrinfo :\t " + cellSignalStrengthNr);
     //                        Log.e("66666", "CsiRsrp:\t " + cellSignalStrengthNr.getCsiRsrp());
     //                        Log.e("66666", "CsiRsrq:\t " + cellSignalStrengthNr.getCsiRsrq());
     //                        Log.e("66666", "Ss2 SsRsrq:\t " + ss2);
@@ -332,21 +344,33 @@ public class MainActivity extends AppCompatActivity {
     //                        Log.e("66666", "SsSinr:\t " + cellSignalStrengthNr.getSsSinr());
     //                        Toast.makeText(MainActivity.this, "Nr5g"+ ss1, Toast.LENGTH_SHORT).show();
                             type="Nr";
-                            if(ss1>-128 && ss1<0) {
-                                if(Nrcounter==0){
+
+                            if(ss1>-128 && ss1<0 ){
+                                if( cidint == 198){
                                     Nrss1=ss1;
                                     Nrss2=ss2;
                                     Nrss4=ss4;
-                                }
-                                Nrdbm1s = Nrdbm1s + ss1;
-                                if(ss2>-128 && ss2<0)   Nrdbm2s = Nrdbm2s + ss2;
-                                if(ss3>-128 && ss3<0)   Nrdbm3s = Nrdbm3s + ss3;
-                                if(ss4>0 && ss4<100)    Nrdbm4s = Nrdbm4s + ss4;
-                                Nrcounter++;
-                                Log.e("66666", "Nrss1 :\t " + ss1);
-//                                Log.e("66666", "ss2 :\t " + ss2);
-//                                Log.e("66666", "dbm2s :\t " + Nrdbm2s/Nrcounter);
+                                    Nrcounter++;
+                                    cidflag = true;
+//                                    Log.e("cid", "CIDNrss1 :\t " + ss1);
                             }
+//                                Log.e("cid", "Nrss1 :\t " + ss1);
+                            }
+//                            if(ss1>-128 && ss1<0) {
+//                                if(Nrcounter==0){
+//                                    Nrss1=ss1;
+//                                    Nrss2=ss2;
+//                                    Nrss4=ss4;
+//                                }
+//                                Nrdbm1s = Nrdbm1s + ss1;
+//                                if(ss2>-128 && ss2<0)   Nrdbm2s = Nrdbm2s + ss2;
+//                                if(ss3>-128 && ss3<0)   Nrdbm3s = Nrdbm3s + ss3;
+//                                if(ss4>0 && ss4<100)    Nrdbm4s = Nrdbm4s + ss4;
+//                                Nrcounter++;
+//                                Log.e("66666", "Nrss1 :\t " + ss1);
+////                                Log.e("66666", "ss2 :\t " + ss2);
+////                                Log.e("66666", "dbm2s :\t " + Nrdbm2s/Nrcounter);
+//                            }
 //                            Log.e("66666", "ss1 dbm\t " + ss1 );
 //                            Log.e("66666", "ss2 dbm\t " + ss2 );
 
@@ -362,6 +386,16 @@ public class MainActivity extends AppCompatActivity {
                             dbm2 = Nrss2;
                             dbm3 = Nrss3;
                             dbm4 = Nrss4;
+                            if(cidflag) {
+                                cidshowflag = true;
+                                cidflag=false;
+                            }
+                            else {
+                                cidshowflag = false;
+                                cidflag=false;
+                            }
+
+
 //                        }
 //                        else {
 //                            dbm1 = Nrdbm1s / Nrcounter;
@@ -507,6 +541,7 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     private void showtext() {
+        String  cidinfo="";
             try {
                 if (mode) {
                     if (BLE)
@@ -514,14 +549,18 @@ public class MainActivity extends AppCompatActivity {
                     else
                         BLEstateinfo="蓝牙未连接";
                     if(type == "Nr") {
+                        if(cidshowflag)
+                            cidinfo=" cid198";
+                        else
+                            cidinfo=" *6[P198丢失";
                         if (charttype == 1)
-                            sendView.setText(BLEstateinfo +"Nr_SsRsrp:" + String.format("%.1f", dbm1) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo + cidinfo +" Nr_SsRsrp:" + String.format("%.1f", dbm1) + "dBm" + "\n");
                         else if (charttype == 2)
-                            sendView.setText(BLEstateinfo +"Nr_SsRsrq:" + String.format("%.1f", dbm2) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo + cidinfo +" Nr_SsRsrq:" + String.format("%.1f", dbm2) + "dBm" + "\n");
                         else if (charttype == 3)
-                            sendView.setText(BLEstateinfo +"Nr_CsiRsrp:" + String.format("%.1f", dbm3) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo + cidinfo +" Nr_CsiRsrp:" + String.format("%.1f", dbm3) + "dBm" + "\n");
                         else if (charttype == 4)
-                            sendView.setText(BLEstateinfo +"Nr_SsSinr:" + String.format("%.1f", dbm4) + "dBm" + "\n");
+                            sendView.setText(BLEstateinfo + cidinfo +" Nr_SsSinr:" + String.format("%.1f", dbm4) + "dBm" + "\n");
                     }
                     else if(type == "Lte") {
                         if (charttype == 1)
@@ -639,17 +678,17 @@ public class MainActivity extends AppCompatActivity {
                         if (mode) {
 //                            number = ("000000"+number).slice(-pos)
                             if (charttype==1)
-                                message = "@"+ String.format("%4s",(int)(dbm1*(-10))).replaceAll(" ", "0")+"#";
+                                message = "@"+ String.format("%4s",(int)((128+dbm1)*10)).replaceAll(" ", "0")+"#";
                             else if(charttype==2)
-                                message = "@"+ String.format("%4s",(int)(dbm2*(-10))).replaceAll(" ", "0")+"#";
+                                message = "@"+ String.format("%4s",(int)((20+dbm2)*10)).replaceAll(" ", "0")+"#";
                             else if(charttype==3)
-                                message = "@"+ String.format("%4s",(int)(dbm3*(-10))).replaceAll(" ", "0")+"#";
+                                message = "@"+ String.format("%4s",(int)((128+dbm3)*10)).replaceAll(" ", "0")+"#";
                             else if(charttype==4)
-                                message = "@"+ String.format("%4s",(int)(dbm4*10)).replaceAll(" ", "0")+"#";
+                                message = "@"+ String.format("%4s",(int)((120+dbm4)*10)).replaceAll(" ", "0")+"#";
 //                                Log.e("66666", "message \t " + message );
                         }
                         else {
-                            message = "@"+ String.format("%4s",mywifiinfo.getRssi()*(-10)).replaceAll(" ", "0")+"#";
+                            message = "@"+ String.format("%4s",(128+mywifiinfo.getRssi())*(10)).replaceAll(" ", "0")+"#";
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
