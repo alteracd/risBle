@@ -1,6 +1,5 @@
 package com.example.bler;
 
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,44 +13,53 @@ public class myAdapter extends BaseAdapter{
 
     private Context myContext;
     private LayoutInflater myLayoutInflater;
-    private ArrayList<BluetoothDevice> myBluetoothDeviceList;
+    private ArrayList<String> mycells;
 
     public myAdapter(Context context) {
         super();
         this.myContext = context;
         this.myLayoutInflater = LayoutInflater.from(this.myContext);
-        this.myBluetoothDeviceList = new ArrayList<>();
+        this.mycells = new ArrayList<String>();
     }
 
-    public void addDevice(BluetoothDevice device) {
-        if(!myBluetoothDeviceList.contains(device))
-            myBluetoothDeviceList.add(device);
+    public void addCell(String cellstring) {
+        int flag=1;
+        for(String cell:mycells) {
+            String[] cell_string = cellstring.split("\\+");
+            String[] mycell_string = cell.split("\\+");
+            if (cell_string[0]==mycell_string[0]){
+                flag=0;
+                break;
+            }
+        }
+        if(flag==1)
+            mycells.add(cellstring);
     }
 
     public void clear() {
-        myBluetoothDeviceList.clear();
+        mycells.clear();
     }
 
     public boolean isEmpty() {
-        return myBluetoothDeviceList.isEmpty();
+        return mycells.isEmpty();
     }
 
     public int size() {
-        return myBluetoothDeviceList.size();
+        return mycells.size();
     }
 
-    public BluetoothDevice getDevice(int positon) {
-        return myBluetoothDeviceList.get(positon);
+    public String getCell(int positon) {
+        return mycells.get(positon);
     }
 
     @Override
     public int getCount() {
-        return myBluetoothDeviceList.size();
+        return mycells.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return myBluetoothDeviceList.get(position);
+        return mycells.get(position);
     }
 
     @Override
@@ -65,21 +73,22 @@ public class myAdapter extends BaseAdapter{
         if(convertView == null) {
             convertView = myLayoutInflater.inflate(R.layout.my_adapter_item, null);
             ViewHolder = new myAdapterViewHolder();
-            ViewHolder.devcieName = convertView.findViewById(R.id.device_name);
-            ViewHolder.deviceAddress = convertView.findViewById(R.id.device_address);
+            ViewHolder.PCI = convertView.findViewById(R.id.cellPCI);
+            ViewHolder.celldbm = convertView.findViewById(R.id.celldbm);
             convertView.setTag(ViewHolder);
         }else {
             ViewHolder = (myAdapterViewHolder) convertView.getTag();
         }
-        String Name =  "设备名: " + myBluetoothDeviceList.get(position).getName();
-        String Address = "MAC: " + myBluetoothDeviceList.get(position).getAddress();
-        ViewHolder.devcieName.setText(Name);
-        ViewHolder.deviceAddress.setText(Address);
+        String[] cellstring= mycells.get(position).split("\\+");
+        String CellPCI =  "PCI: " + cellstring[0];
+        String Celldbm = "dbm: " + cellstring[1];
+        ViewHolder.PCI.setText(CellPCI);
+        ViewHolder.celldbm.setText(Celldbm);
         return convertView;
     }
 
     static class myAdapterViewHolder {
-        public TextView devcieName;
-        public TextView deviceAddress;
+        public TextView PCI;
+        public TextView celldbm;
     }
 }

@@ -8,14 +8,14 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ble"/>
+        android:src="@drawable/cell"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
         <TextView
-            android:id="@+id/device_name"
+            android:id="@+id/cellPCI"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_marginTop="3dp"
@@ -23,7 +23,7 @@
             android:textColor="@color/black"
             android:textSize="18sp"/>
         <TextView
-            android:id="@+id/device_address"
+            android:id="@+id/celldbm"
             android:layout_width="match_parent"
             android:layout_height="20dp"
             android:textColor="@color/black"
