@@ -1,10 +1,8 @@
 package com.example.bler;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -28,12 +26,10 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
 import android.content.pm.PackageManager;
-import android.icu.lang.UCharacter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,22 +50,17 @@ import android.telephony.CellSignalStrengthWcdma;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
-import android.text.Editable;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-//import android.widget.EditText;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -78,9 +69,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
-
-import lecho.lib.hellocharts.gesture.ContainerScrollType;
-import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Line;
@@ -170,11 +158,9 @@ public class MainActivity extends AppCompatActivity {
     public void getBlePermissionFromSys() {
         if (Build.VERSION.SDK_INT >= 23) {
             int REQUEST_CODE_CONTACT = 102;
-            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-            //验证是否许可权限
+            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};//验证是否许可权限
             for (String str : permissions) {
-                if (this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
-                    //申请权限
+                if (this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {//申请权限
                     this.requestPermissions(permissions, REQUEST_CODE_CONTACT);
                     Log.e("perm", "申请权限\t ");
                     return;
@@ -186,8 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
     /** 蓝牙扫描 **/
     private void scanLeDevice() {
-        if (!scanning) {
-            // Stops scanning after a predefined scan period.
+        if (!scanning) {// Stops scanning after a predefined scan period.
             myHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -221,7 +206,6 @@ public class MainActivity extends AppCompatActivity {
         TelephonyManager.CellInfoCallback cellInfoCallback = new TelephonyManager.CellInfoCallback() {
             @Override
             public void onCellInfo(List<CellInfo> cellInfoList) {
-                // DO SOMETHING
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                     int ss1 = 0;
                     int ss2 = 0;
@@ -239,7 +223,6 @@ public class MainActivity extends AppCompatActivity {
                     double Nrss2 = 0;
                     double Nrss3 = 0;
                     double Nrss4 = 0;
-                    int NrPCI = 0;
                     String cid = "";
 
                     int Ltecounter = 0;
@@ -247,9 +230,7 @@ public class MainActivity extends AppCompatActivity {
                     double Ltess2 = 0;
                     double Ltess3 = 0;
                     double Ltess4 = 0;
-                    int LtePCI = 0;
                     int nowPCI;
-
 
                     if (null != cellInfoList) {
                         cellList.clear();
@@ -263,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
                                     dbm1s = dbm1s + ss1;
                                     counter++;
                                 }
-                                //                        Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
+                                //Log.e("66666", "cellSignalStrengthGsm" + cellSignalStrengthGsm.toString());
                                 Log.e("66666", "gsm dbm\t " + ss1);
                             } else if (cellInfo instanceof CellInfoCdma) {
                                 CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma) cellInfo).getCellSignalStrength();
@@ -273,14 +254,14 @@ public class MainActivity extends AppCompatActivity {
                                     dbm1s = dbm1s + ss1;
                                     counter++;
                                 }
-                                //                        Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
+                                //Log.e("66666", "cellSignalStrengthCdma" + cellSignalStrengthCdma.toString() );
                                 Log.e("66666", "cdma dbm\t " + ss1);
                             } else if (cellInfo instanceof CellInfoWcdma) {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                                     CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma) cellInfo).getCellSignalStrength();
                                     ss1 = cellSignalStrengthWcdma.getDbm();
-                                    //                            Log.e("66666", "cellSignalStrengthWcdma" + cellSignalStrengthWcdma.toString() );
-                                    //                            Log.e("66666", "wcdma dbm\t " + ss1 );
+                                    //Log.e("66666", "cellSignalStrengthWcdma" + cellSignalStrengthWcdma.toString() );
+                                    //Log.e("66666", "wcdma dbm\t " + ss1 );
                                     type = "Wcdma";
                                     if (ss1 > -128 && ss1 < 0) {
                                         dbm1s = dbm1s + ss1;
@@ -323,45 +304,6 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
                                 Ltecounter++;
-                                /*
-                                if (ss1 > -150 && ss1 < 0) {
-                                    if (Ltecounter == 0) {
-                                        Ltess1 = ss1;
-                                        if (ss2 > -150 && ss2 < 0) Ltess2 = ss2;
-                                        else Ltess2 = 0;
-                                        if (ss3 > -150 && ss3 < 0) Ltess3 = ss3;
-                                        else Ltess3 = 0;
-                                        if (ss4 > 0 && ss4 < 150) Ltess4 = ss4;
-                                        else Ltess4 = 0;
-                                        LtePCI = ((CellInfoLte) cellInfo).getCellIdentity().getPci();
-                                    } else {
-                                        if (Ltess1 < ss1) { //为负数
-                                            Ltess1 = ss1;
-                                            if (ss2 > -150 && ss2 < 0) Ltess2 = ss2;
-                                            else Ltess2 = 0;
-                                            if (ss3 > -150 && ss3 < 0) Ltess3 = ss3;
-                                            else Ltess3 = 0;
-                                            if (ss4 > 0 && ss4 < 150) Ltess4 = ss4;
-                                            else Ltess4 = 0;
-                                            LtePCI = ((CellInfoLte) cellInfo).getCellIdentity().getPci();
-                                        }
-                                    }
-                                }
-                                Ltecounter++;
-                                */
-                            /*
-                            if(ss1>-150 && ss1<0) {
-                                if(Ltecounter==0){
-                                    Ltess1=ss1;
-                                    Ltess2=ss2;
-                                    Ltess4=ss4;
-                                }
-                                Ltedbm1s = Ltedbm1s + ss1;
-                                if(ss2>-150 && ss2<0)   Ltedbm2s = Ltedbm2s + ss2;
-                                if(ss3>-150 && ss3<0)   Ltedbm3s = Ltedbm3s + ss3;
-                                if(ss4>0 && ss4<150)    Ltedbm4s = Ltedbm4s + ss4;
-                            }
-                            */
                             } else if (cellInfo instanceof CellInfoNr) { /** 5G **/
                                 type = "Nr";
 
@@ -410,68 +352,8 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
                                 Nrcounter++;
-                                /*
-                                if (ss1 > -150 && ss1 < 0) {
-                                    if (Nrcounter == 0) {
-                                        Nrss1 = ss1;
-                                        if (ss2 > -150 && ss2 < 0) Nrss2 = ss2;
-                                        else Nrss2 = 0;
-                                        if (ss3 > -150 && ss3 < 0) Nrss3 = ss3;
-                                        else Nrss3 = 0;
-                                        if (ss4 > 0 && ss4 < 150) Nrss4 = ss4;
-                                        else Nrss4 = 0;
-                                        NrPCI = cidint;
-                                    } else {
-                                        if (Nrss1 < ss1) { //为负数
-                                            Nrss1 = ss1;
-                                            if (ss2 > -150 && ss2 < 0) Nrss2 = ss2;
-                                            else Nrss2 = 0;
-                                            if (ss3 > -150 && ss3 < 0) Nrss3 = ss3;
-                                            else Nrss3 = 0;
-                                            if (ss4 > 0 && ss4 < 150) Nrss4 = ss4;
-                                            else Nrss4 = 0;
-                                            NrPCI = cidint;
-                                        }
-                                    }
-                                }
-                                Nrcounter++;
-                                */
-                            /*
-                            if(ss1>-128 && ss1<0 ){
-                                if( cidint == 198){
-                                    Nrss1=ss1;
-                                    Nrss2=ss2;
-                                    Nrss4=ss4;
-                                    Nrcounter++;
-                                    cidflag = true;
-//                                    Log.e("cid", "CIDNrss1 :\t " + ss1);
-                            }
-//                                Log.e("cid", "Nrss1 :\t " + ss1);
-                            }
-
-//                            if(ss1>-128 && ss1<0) {
-//                                if(Nrcounter==0){
-//                                    Nrss1=ss1;
-//                                    Nrss2=ss2;
-//                                    Nrss4=ss4;
-//                                }
-//                                Nrdbm1s = Nrdbm1s + ss1;
-//                                if(ss2>-128 && ss2<0)   Nrdbm2s = Nrdbm2s + ss2;
-//                                if(ss3>-128 && ss3<0)   Nrdbm3s = Nrdbm3s + ss3;
-//                                if(ss4>0 && ss4<100)    Nrdbm4s = Nrdbm4s + ss4;
-//                                Nrcounter++;
-//                                Log.e("66666", "Nrss1 :\t " + ss1);
-////                                Log.e("66666", "ss2 :\t " + ss2);
-////                                Log.e("66666", "dbm2s :\t " + Nrdbm2s/Nrcounter);
-//                            }
-//                            Log.e("66666", "ss1 dbm\t " + ss1 );
-//                            Log.e("66666", "ss2 dbm\t " + ss2 );
-
-//                           Toast.makeText(MainActivity.this, "NR5g"+ ss1, Toast.LENGTH_SHORT).show();
-                            */
                             }
                         }
-                        //searchList.setAdapter(ListAdapter);
                     }
                     //Log.e("66666", "Nrcounter \t " + Nrcounter );
                     //Log.e("66666", "Ltecounter \t " + Ltecounter );
@@ -682,7 +564,8 @@ public class MainActivity extends AppCompatActivity {
     /** 图表上方按钮信息显示 **/
     @SuppressLint("SetTextI18n")
     private void showinfo() {
-            try {
+        MainActivity.this.runOnUiThread(new Runnable() {//只有创建这个view的线程才能触碰到它的views 否则会出错闪退
+            public void run() {
                 if (mode) {
                     if(type == "Nr") {
                         infoButton1.setText("SsRsrp:\n" + String.format("%.2f",dbm1));
@@ -729,11 +612,8 @@ public class MainActivity extends AppCompatActivity {
                     infoButton3.setText("");
                     infoButton4.setText("");
                 }
-//                message = "@"+String.format("%5s",mywifiinfo.getRssi()*(-10)).replaceAll(" ", "0")+"#";
-//                Log.e("66666", "message\t " + message);
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        });
     }
 
     /** 蓝牙信息发送 **/
@@ -745,27 +625,38 @@ public class MainActivity extends AppCompatActivity {
         flag=!flag;
         if(flag) {
             if (myBluetoothGatt != null ) {
-                blesend();
-                myBLETimer.schedule(BLEsendTimerTask, 0, freq);
+                try {
+                    blesend();
+                    myBLETimer.schedule(BLEsendTimerTask, 0, freq);
+                    sendButton.setText("停止发送");
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                    Toast.makeText(MainActivity.this, "发送失败！" , Toast.LENGTH_SHORT).show();
+                }
             }
-            sendButton.setText("停止发送");
+
         }
         else{
-            BLEsendTimerTask.cancel();
-            myBLETimer.purge();
-            sendButton.setText("启动发送");
+            try {
+                BLEsendTimerTask.cancel();
+                myBLETimer.purge();
+                sendButton.setText("启动发送");
+            }catch(Exception ex){
+                ex.printStackTrace();
+                Toast.makeText(MainActivity.this, "错误！" , Toast.LENGTH_SHORT).show();
+            }
         }
 
-    } /** 蓝牙信息发送 **/
-
+    }
     /** 蓝牙发送任务设定  **/
-    private void blesend(){
+    private void blesend() {
         BLEsendTimerTask = new TimerTask() {
             @SuppressLint("SetTextI18n")
             @Override
             public void run() {
+                try {
                 if (flag) {
-                    try {
+
                         if (mode) {
 //                            number = ("000000"+number).slice(-pos)
                             if (charttype==1)
@@ -781,13 +672,15 @@ public class MainActivity extends AppCompatActivity {
                         else {
                             message = "@"+ String.format("%4s",(128+mywifiinfo.getRssi())*(10)).replaceAll(" ", "0")+"#";
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    myCharateristic.setValue(message);
-                    myBluetoothGatt.writeCharacteristic(myCharateristic);
-                    myBluetoothGatt.setCharacteristicNotification(myCharateristic, true);
-                    //+"linkSpeed:"+String.valueOf(mywifiinfo.getTxLinkSpeedMbps())+"Mbps");
+
+
+                        myCharateristic.setValue(message);
+                        myBluetoothGatt.writeCharacteristic(myCharateristic);
+                        myBluetoothGatt.setCharacteristicNotification(myCharateristic, true);
+                        //+"linkSpeed:"+String.valueOf(mywifiinfo.getTxLinkSpeedMbps())+"Mbps");
+                }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         };
@@ -811,7 +704,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**  cell列表初始化  **/
+    /**  基站PCI列表初始化  **/
     void initView() throws UnsupportedEncodingException {
         //BLE list initial
         ListAdapter = new myAdapter(MainActivity.this);
@@ -897,39 +790,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /** 蓝牙列表 **/
-    private void showSearchList() {
-//      scanning = false;
-//      myBluetoothLeScanner.stopScan(leScanCallback);
-        ListAdapter.clear();
-//      scanning = true;
-//      myBluetoothLeScanner.startScan(leScanCallback);
-        scanLeDevice();
-        //ListAdapter.notifyDataSetChanged();
-        searchList.setAdapter(ListAdapter);
-//        searchList.invalidate();
-//        searchList.postInvalidate();
-    }
-
-    /**蓝牙列表初始化等**/
-    /*
-    void initView() throws UnsupportedEncodingException {
-        //BLE list initial
-        searchList = findViewById(R.id.search_list);
-        searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedDevice = ListAdapter.getDevice(position);
-                Toast.makeText(MainActivity.this, "设备名：" + selectedDevice.getName(), Toast.LENGTH_SHORT).show();
-                myBluetoothGatt = selectedDevice.connectGatt(MainActivity.this, false, bluetoothGattCallback, BluetoothDevice.TRANSPORT_LE);
-            }
-        });
-    }*/
-
+    /** BLE扫描、连接  弹出窗  **/
     public void BLEconnect(){
 
-        scanLeDevice();
-        Log.e("BLE", "BLEList\t " + dialogflag);
+        scanLeDevice();//扫描BLE设备
 
         BLEDeviceList = new ArrayList<String>();
         if (dialogflag!=0) {
@@ -957,8 +821,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 try{
                     myBluetoothGatt = selectedDevice.connectGatt(MainActivity.this, false, bluetoothGattCallback, BluetoothDevice.TRANSPORT_LE);
-                }catch(Exception ex){
-                    ex.printStackTrace();
+                }catch(Exception exp){
+                    exp.printStackTrace();
                     Toast.makeText(MainActivity.this, "连接失败" , Toast.LENGTH_SHORT).show();
                 }
                 BLEdialog.dismiss();
@@ -976,9 +840,21 @@ public class MainActivity extends AppCompatActivity {
         }
         dialogflag++;
     }
+     /*
+    void initView() throws UnsupportedEncodingException {
+        //BLE list initial
+        searchList = findViewById(R.id.search_list);
+        searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedDevice = ListAdapter.getDevice(position);
+                Toast.makeText(MainActivity.this, "设备名：" + selectedDevice.getName(), Toast.LENGTH_SHORT).show();
+                myBluetoothGatt = selectedDevice.connectGatt(MainActivity.this, false, bluetoothGattCallback, BluetoothDevice.TRANSPORT_LE);
+            }
+        });
+    }*/
 
-    /** 蓝牙启动、设置与连接 **/
-
+    /** 蓝牙初始化、设置与连接 **/
     private void initBluetooth() {
         myBluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         myBluetoothAdapter = myBluetoothManager.getAdapter();
@@ -986,8 +862,8 @@ public class MainActivity extends AppCompatActivity {
             myBluetoothAdapter.enable();
         myBluetoothLeScanner = myBluetoothAdapter.getBluetoothLeScanner();
         scanning = true;
-        myHandler = new Handler();
-        ListBLEAdapter = new myBLEAdapter(MainActivity.this);
+        myHandler = new Handler();//
+        ListBLEAdapter = new myBLEAdapter(MainActivity.this);//BLE设备列表
         leScanCallback = new ScanCallback() {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
@@ -1009,27 +885,23 @@ public class MainActivity extends AppCompatActivity {
                     //Toast.makeText(MainActivity.this, "连接成功连接成功" ,Toast.LENGTH_SHORT).show();
                     //Looper.loop();
                     gatt.discoverServices();// search service
-//                    BLE_flag=true;
                     BLE = true;
                     sendView.setText("已连接:"+selectedDevice.getName());
                     Log.e(TAG, "onConnectionStateChange 查找成功");
 
                 } else if (newState == BluetoothProfile.STATE_CONNECTING) {
                     Log.e(TAG, "onConnectionStateChange 连接中......");
-//                    BLE_flag=true;
                     BLE = false;
                     sendView.setText(selectedDevice.getName()+"连接中......");
 
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     Log.e(TAG, "onConnectionStateChange 连接断开");
-//                    BLE_flag=true;
                     BLE = false;
                     sendView.setText(selectedDevice.getName()+"连接断开");
                     myBluetoothGatt.close();
 
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTING) {
                     Log.e(TAG, "onConnectionStateChange 连接断开中......");
-//                    BLE_flag=true;
                     BLE = false;
                     sendView.setText(selectedDevice.getName()+"连接断开");
                 }
@@ -1084,8 +956,8 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    /** 启动WIFI信号强度获取定时器 **/
-    private void initWiFi_Mobile() {
+    /** 启动定时器 包括wifi强度、移动网络信号强度、信息显示 **/
+    private void initTimer() {
         TimerTask myTimerTask = new TimerTask() {
             @Override
             public void run() {
@@ -1107,7 +979,7 @@ public class MainActivity extends AppCompatActivity {
 //        UUID_CHAR_READ = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
 //        UUID_CHAR_WRITE = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
 
-        //ATK BLE01
+        //ATK BLE01   2B
         UUID_SERVER = UUID.fromString("d973f2e0-b19e-11e2-9e96-080020f29a66");
         UUID_CHAR_READ = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
         UUID_CHAR_WRITE = UUID.fromString("d973f2e2-b19e-11e2-9e96-0800200c9a66");
@@ -1287,7 +1159,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        initWiFi_Mobile();
+        initTimer();
 
         /**  BLE蓝牙初始化 **/
         initBluetooth();
