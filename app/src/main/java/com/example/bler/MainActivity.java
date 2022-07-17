@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
                     double Ltess2 = 0;
                     double Ltess3 = 0;
                     double Ltess4 = 0;
-                    int nowPCI;
+                    int nowPCI=0;
 
                     if (null != cellInfoList) {
                         cellList.clear();
@@ -298,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
                                         else Ltess3 = 0;
                                         if (ss4 > 0 && ss4 < 150) Ltess4 = ss4;
                                         else Ltess4 = 0;
-                                        //Log.e("66666", "Lteinfo :\t " + cellSignalStrengthLte);
+                                        Log.e("66666", "Lteinfo :\t " + cellSignalStrengthLte);
                                         //Log.e("66666", "Lteinfo :\t " + ((CellInfoLte) cellInfo).getCellIdentity());
                                         //Log.e("66666", "4GRsrp\t " + nowPCI +" "+ ss3);
                                     }
@@ -312,12 +312,13 @@ public class MainActivity extends AppCompatActivity {
                                 ss2 = -1 * cellSignalStrengthNr.getSsRsrq();
                                 ss3 = cellSignalStrengthNr.getCsiRsrp();
                                 ss4 = cellSignalStrengthNr.getSsSinr();
-                                //Log.e("66666", "5Gcellinfo\t " + cellInfo );
+                                Log.e("66666", "5Gcellinfo\t " + cellInfo );
                                 //PCI = (CellIdentityNr)((CellInfoNr)cellInfo).getCellIdentity().getNci();
                                 cid = ((CellInfoNr) cellInfo).getCellIdentity().toString().substring(24, 27);
                                 cid = cid.replaceAll(" ", "");
+                                cid = cid.replaceAll("[a-zA-Z]","");
                                 nowPCI = Integer.parseInt(cid);
-                                //Log.e("66666", "cid\t " + cid);
+                                Log.e("66666", "cid\t " + cid);
                                 //Log.e("66666", "Nrinfo :\t " + cellSignalStrengthNr);
                                 //Log.e("66666", "Nrinfo :\t " + ((CellInfoNr) cellInfo).getCellIdentity().toString());
                                 //                        Log.e("66666", "CsiRsrp:\t " + cellSignalStrengthNr.getCsiRsrp());
