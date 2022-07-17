@@ -80,7 +80,7 @@ public class myAdapter extends BaseAdapter{
             ViewHolder = (myAdapterViewHolder) convertView.getTag();
         }
         String[] cellstring= mycells.get(position).split("\\+");
-        String CellPCI =  "PCI: " + cellstring[0];
+        String CellPCI =  "PCI: " + cellstring[0]+" arfcn:"+cellstring[2];
         String Celldbm = "dbm: " + cellstring[1];
         ViewHolder.PCI.setText(CellPCI);
         ViewHolder.celldbm.setText(Celldbm);

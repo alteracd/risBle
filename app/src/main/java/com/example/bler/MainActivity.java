@@ -34,6 +34,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.telephony.CellIdentityLte;
 import android.telephony.CellIdentityNr;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoCdma;
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
     private double dbm3 = -1;
     private double dbm4 = -1;
     private int PCI = 0;
+    private String frqcn ="";
     private WifiManager mywifiManager;
     private WifiInfo mywifiinfo;
     private String type = ""; //流量类型
@@ -224,13 +226,16 @@ public class MainActivity extends AppCompatActivity {
                     double Nrss3 = 0;
                     double Nrss4 = 0;
                     String cid = "";
+                    String mNrArfcn = "";
 
                     int Ltecounter = 0;
                     double Ltess1 = 0;
                     double Ltess2 = 0;
                     double Ltess3 = 0;
                     double Ltess4 = 0;
+                    String fcn = "";
                     int nowPCI=0;
+
 
                     if (null != cellInfoList) {
                         cellList.clear();
@@ -277,6 +282,8 @@ public class MainActivity extends AppCompatActivity {
                                 ss2 = cellSignalStrengthLte.getRsrq();
                                 ss4 = cellSignalStrengthLte.getRssnr();
                                 nowPCI = ((CellInfoLte) cellInfo).getCellIdentity().getPci();
+                                //Log.e("66666", "4Gcellinfo\t " + cellInfo );
+                                fcn = String.valueOf(((CellInfoLte) cellInfo).getCellIdentity().getEarfcn());
 
                                 /** 去除重复 **/
                                 for(int i=0; i<cellList.size();i++) {
@@ -286,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                                         cellList.remove(i);
                                     }
                                 }
-                                cellList.add(nowPCI+"+"+ss3);
+                                cellList.add(nowPCI+"+"+ss1+"+"+fcn);
 
                                 /** 筛选选定的PCI  **/
                                 if (ss1 > -150 && ss1 < 0) {
@@ -318,7 +325,14 @@ public class MainActivity extends AppCompatActivity {
                                 cid = cid.replaceAll(" ", "");
                                 cid = cid.replaceAll("[a-zA-Z]","");
                                 nowPCI = Integer.parseInt(cid);
-                                Log.e("66666", "cid\t " + cid);
+                                //Log.e("66666", "cid\t " + cid);
+
+                                mNrArfcn = ((CellInfoNr) cellInfo).getCellIdentity().toString().substring(45, 58);
+                                mNrArfcn = mNrArfcn.replaceAll(" ","");
+                                mNrArfcn = mNrArfcn.replaceAll("=","");
+                                mNrArfcn = mNrArfcn.replaceAll("[a-zA-Z]","");
+                                //Log.e("66666", "mNrArfcn\t " + mNrArfcn );
+
                                 //Log.e("66666", "Nrinfo :\t " + cellSignalStrengthNr);
                                 //Log.e("66666", "Nrinfo :\t " + ((CellInfoNr) cellInfo).getCellIdentity().toString());
                                 //                        Log.e("66666", "CsiRsrp:\t " + cellSignalStrengthNr.getCsiRsrp());
@@ -335,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
                                         cellList.remove(i);
                                     }
                                 }
-                                cellList.add(nowPCI+"+"+ss1);
+                                cellList.add(nowPCI+"+"+ss1+"+"+mNrArfcn);
 
                                 /** 筛选选定的PCI  **/
                                 if (ss1 > -150 && ss1 < 0) {
@@ -364,12 +378,14 @@ public class MainActivity extends AppCompatActivity {
                         dbm3 = Nrss3;
                         dbm4 = Nrss4;
                         PCI = selectedCellPCI;
+                        frqcn = mNrArfcn;
                     } else if (Ltecounter != 0 && type == "Lte") {
                         dbm1 = Ltess1;
                         dbm2 = Ltess2;
                         dbm3 = Ltess3;
                         dbm4 = Ltess4;
                         PCI = selectedCellPCI;
+                        frqcn = fcn;
                     } else if (counter != 0) {
                         dbm1 = dbm1s / counter;
                         dbm2 = dbm2s / counter;
