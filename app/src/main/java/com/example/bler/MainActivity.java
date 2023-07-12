@@ -1,9 +1,6 @@
 package com.example.bler;
 
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -19,23 +16,16 @@ import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-
-import android.content.DialogInterface;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.telephony.CellIdentityLte;
-import android.telephony.CellIdentityNr;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoCdma;
 import android.telephony.CellInfoGsm;
@@ -61,6 +51,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
@@ -89,10 +82,12 @@ public class MainActivity extends AppCompatActivity {
     private Button infoButton4;
     private Button infoButton3;
     private Button freq_set;
+    private Button cd_send;
     private ListView searchList;
     private Button sendButton;
     private TextView sendView;
     private EditText freq_edit;
+    private EditText cd_edit;
     private AlertDialog BLEdialog; //单选框
 
     /** 信号强度 **/
@@ -107,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
     private String type = ""; //流量类型
 
     /** 蓝牙发送相关 **/
+    private String code = "";//发送指令
     private String message = "";//发送信息
     private boolean flag = false; //发送
     private boolean BLE = false; //BLE连接
@@ -668,6 +664,7 @@ public class MainActivity extends AppCompatActivity {
     /** 蓝牙发送任务设定  **/
     private void blesend() {
         BLEsendTimerTask = new TimerTask() {
+            @android.support.annotation.RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
             @SuppressLint("SetTextI18n")
             @Override
             public void run() {
@@ -689,7 +686,6 @@ public class MainActivity extends AppCompatActivity {
                         else {
                             message = "@"+ String.format("%4s",(128+mywifiinfo.getRssi())*(10)).replaceAll(" ", "0")+"#";
                         }
-
 
                         myCharateristic.setValue(message);
                         myBluetoothGatt.writeCharacteristic(myCharateristic);
@@ -750,7 +746,7 @@ public class MainActivity extends AppCompatActivity {
         searchButton.setText("BLE搜索");
         searchButton.setOnClickListener(v -> BLEconnect());
         ViewGroup.LayoutParams BtnPara = searchButton.getLayoutParams();
-        BtnPara.width = width/2 - 15;
+        BtnPara.width = width/3 - 15;
         searchButton.setLayoutParams(BtnPara);
 //        searchButton.setWidth(width/2 - 4);
 
@@ -759,7 +755,7 @@ public class MainActivity extends AppCompatActivity {
         sendButton.setText("启动发送");
         sendButton.setOnClickListener(v -> sendMessage());
         BtnPara = sendButton.getLayoutParams();
-        BtnPara.width = width/2 - 15;
+        BtnPara.width = width/3 - 15;
         sendButton.setLayoutParams(BtnPara);
 //        sendButton.setWidth(width/2 - 4);
 
@@ -771,7 +767,7 @@ public class MainActivity extends AppCompatActivity {
         modeButton.setText("类型：移动网络");
         modeButton.setOnClickListener(v -> modechange());
         BtnPara = modeButton.getLayoutParams();
-        BtnPara.width = width/2 - 15;
+        BtnPara.width = width/3 - 15;
         modeButton.setLayoutParams(BtnPara);
 //        modeButton.setWidth(width/2 - 4);
 
@@ -801,10 +797,52 @@ public class MainActivity extends AppCompatActivity {
         freq_edit=(EditText)findViewById(R.id.edit_freq);
         ViewGroup.LayoutParams setbtnPara = freq_set.getLayoutParams();
         BtnPara = freq_edit.getLayoutParams();
-        BtnPara.width = width/2 -40 -setbtnPara.width ;
+        BtnPara.width = width/2 - 35 -setbtnPara.width ;
         freq_edit.setLayoutParams(BtnPara);
 //        freq_edit.setWidth(width/4 + 4);
 
+        /** 指令发送按键 **/
+        cd_send=findViewById(R.id.cd_button);
+        cd_send.setText("发送");
+        cd_send.setOnClickListener(v -> sendCode());
+        /** 指令输入框 **/
+        cd_edit=(EditText)findViewById(R.id.edit_cd);
+        setbtnPara = cd_send.getLayoutParams();
+        BtnPara = cd_edit.getLayoutParams();
+        BtnPara.width = width/2 - 35 -setbtnPara.width ;
+        cd_edit.setLayoutParams(BtnPara);
+
+
+    }
+
+    /** 控制机代码运行方式 指令  **/
+    private void sendCode() {
+        try {
+            code = cd_edit.getText().toString();
+        }catch(Exception ex){
+            ex.printStackTrace();
+            Toast.makeText(MainActivity.this, "请重新输入正确数值" , Toast.LENGTH_SHORT).show();
+        }
+        try {
+            if (BLE && flag) {
+                // 暂停反馈发送timer
+                BLEsendTimerTask.cancel();
+                myBLETimer.purge();
+                sendButton.setText("启动发送");
+
+                // 发送指令
+                myCharateristic.setValue("$" + code + "*");
+                myBluetoothGatt.writeCharacteristic(myCharateristic);
+                myBluetoothGatt.setCharacteristicNotification(myCharateristic, true);
+
+                Toast.makeText(MainActivity.this, "发送指令" , Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, code + " 发送失败，蓝牙未连接" , Toast.LENGTH_SHORT).show();
+            }
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            Toast.makeText(MainActivity.this,  code + " 发送失败" , Toast.LENGTH_SHORT).show();
+        }
     }
 
     /** BLE扫描、连接  弹出窗  **/
@@ -857,19 +895,6 @@ public class MainActivity extends AppCompatActivity {
         }
         dialogflag++;
     }
-     /*
-    void initView() throws UnsupportedEncodingException {
-        //BLE list initial
-        searchList = findViewById(R.id.search_list);
-        searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedDevice = ListAdapter.getDevice(position);
-                Toast.makeText(MainActivity.this, "设备名：" + selectedDevice.getName(), Toast.LENGTH_SHORT).show();
-                myBluetoothGatt = selectedDevice.connectGatt(MainActivity.this, false, bluetoothGattCallback, BluetoothDevice.TRANSPORT_LE);
-            }
-        });
-    }*/
 
     /** 蓝牙初始化、设置与连接 **/
     private void initBluetooth() {
@@ -941,7 +966,7 @@ public class MainActivity extends AppCompatActivity {
                             if (UUID_CHAR_WRITE.toString().equals(characteristic.getUuid().toString())) {
                                 myBluetoothService = bluetoothGattService;
                                 myCharateristic = characteristic;
-                                Log.e("Target: ---------------------->", myCharateristic.getUuid().toString());
+                                Log.e("Target: ---------->", myCharateristic.getUuid().toString());
                             }
                         }
                     }

@@ -8,3 +8,5 @@ git config --global user.email "1375137494@qq.com"
 
 
 fix collapse when letters in PCI; generate APK 2022717
+
+add arfcn in cell list;generate APK 2022717
