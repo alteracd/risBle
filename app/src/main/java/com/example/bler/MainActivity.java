@@ -664,7 +664,7 @@ public class MainActivity extends AppCompatActivity {
     /** 蓝牙发送任务设定  **/
     private void blesend() {
         BLEsendTimerTask = new TimerTask() {
-            @android.support.annotation.RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+            //@android.support.annotation.RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
             @SuppressLint("SetTextI18n")
             @Override
             public void run() {
@@ -824,11 +824,13 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "请重新输入正确数值" , Toast.LENGTH_SHORT).show();
         }
         try {
-            if (BLE && flag) {
-                // 暂停反馈发送timer
-                BLEsendTimerTask.cancel();
-                myBLETimer.purge();
-                sendButton.setText("启动发送");
+            if (BLE) {
+                if (flag) { //如果当前还在发送
+                    // 暂停反馈发送timer
+                    BLEsendTimerTask.cancel();
+                    myBLETimer.purge();
+                    sendButton.setText("启动发送");
+                }
 
                 // 发送指令
                 myCharateristic.setValue("$" + code + "*");
